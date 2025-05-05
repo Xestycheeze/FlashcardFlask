@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Create Sets{% endblock %}
+
+{% block content %}
+<h1>Create Sets</h1>
+<form action="/sets/create_sets" method="POST">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+  
+    <button type="submit">Create Flashcard</button>
+</form>
+{% endblock %}

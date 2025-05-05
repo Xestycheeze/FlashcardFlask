@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Create Cards{% endblock %}
+
+{% block content %}
+<h1>This is our Create Cards page</h1>
+<form action="/cards/create_cards" method="POST">
+    <label for="front">Front (Question):</label>
+    <input type="text" id="front" name="front" required>
+  
+    <label for="back">Back (Answer):</label>
+    <input type="text" id="back" name="back" required>
+  
+    <button type="submit">Create Flashcard</button>
+</form>
+{% endblock %}
