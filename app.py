@@ -76,7 +76,7 @@ def create_cards():
         front = request.form.get('front')
         back = request.form.get('back')
         set_id = request.form.get('set_id')
-        
+
         new_card = CardModel(front=front, back=back, set_id=set_id)
         db.session.add(new_card)
         db.session.commit()
