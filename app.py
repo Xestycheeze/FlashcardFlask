@@ -39,14 +39,14 @@ def show_sets():
 @app.route('/create_set', methods=['GET', 'POST'])
 def create_sets():
     if request.method == 'POST':
-        user = db.session.execute(db.select(UserModel).where(UserModel.id == session.get("user_id")))
+        if not session.get("user_id"):
+            return redirect(url_for("login"))
+        user = db.session.execute(db.select(UserModel).where(UserModel.id == session.get("user_id"))).scalar_one_or_none()
         name = request.form.get('name')
         new_set = SetModel(name=name, user_id=user.id)
         db.session.add(new_set)
         db.session.commit()
         return redirect(url_for('show_sets'))
-    if not session.get("user_id"):
-        return redirect(url_for("signup"))
     return render_template("create_sets.html")
 
 #view cards
