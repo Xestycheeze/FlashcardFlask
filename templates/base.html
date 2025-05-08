@@ -16,8 +16,8 @@
                 <li><a href="{{ url_for('create_sets') }}">Create Set</a></li>
                 <li><a href="{{ url_for('create_cards') }}">Create Card</a></li>
 
-                {% if session.get('username') %}
-                    <li>Welcome, {{ session['username'] }}</li>
+                {% if session.get('user_id') %}
+                    <li>Welcome, {{ user.username }}</li>
                     <li><a href="{{ url_for('logout') }}">Logout</a></li>
                 {% else %}
                     <li><a href="{{ url_for('login') }}">Login</a></li>

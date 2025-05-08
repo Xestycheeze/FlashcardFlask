@@ -1,26 +1,32 @@
 from flask import Flask, render_template, url_for, redirect, request, session, flash
 from pathlib import Path
 from db import db
-from models.user import UserModel
-from models.set import SetModel
-from models.card import CardModel
-
+from models import UserModel, SetModel, CardModel
+from werkzeug.security import check_password_hash, generate_password_hash
 #flask + database
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///flashcards.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///flashcard_flask.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.instance_path = Path("./data").resolve()
 #manage user login+logout
 app.secret_key = 'supersecretkey'
 
 db.init_app(app)
 
-
 #home page route
 @app.route('/home')
 @app.route('/')
 def home():
-    users = UserModel.query.all()
-    return render_template("home.html", users=users)
+    user_id = session.get("user_id")
+    if user_id:
+        user = db.session.execute(
+            db.select(UserModel).where(UserModel.id == user_id)
+        ).scalar_one_or_none()
+    context = {
+        "user" : user,
+        "users": UserModel.query.all()
+    }
+    return render_template("home.html", **context)
 
 #view sets from our databse
 @app.route('/sets', methods=['GET'])
@@ -32,15 +38,14 @@ def show_sets():
 @app.route('/create_set', methods=['GET', 'POST'])
 def create_sets():
     if request.method == 'POST':
+        user = db.session.execute(db.select(UserModel).where(UserModel.id == session.get("user_id")))
         name = request.form.get('name')
-        first_user = UserModel.query.first()
-
-        if not first_user:
-            return "Sign up first!", 400
-        new_set = SetModel(name=name, user_id=first_user.id)
+        new_set = SetModel(name=name, user_id=user.id)
         db.session.add(new_set)
         db.session.commit()
         return redirect(url_for('show_sets'))
+    if not session.get("user_id"):
+        return redirect(url_for("signup"))
     return render_template("create_sets.html")
 
 #view cards
@@ -75,7 +80,7 @@ def signup():
     if request.method == 'POST':
         username = request.form.get('username')
         fullname = request.form.get('fullname')
-        password = request.form.get('password')
+        password = generate_password_hash(request.form.get('password'))
 
         #if user exists
         if UserModel.query.filter_by(username=username).first():
@@ -96,26 +101,21 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-
-        user = UserModel.query.filter_by(username=username, password=password).first()
-
-        if user:
-            session['user_id'] = user.id  #save user ID
-            session['username'] = user.username
-            flash('Logged in')
-            return redirect(url_for('home'))
-        else:
-            flash('Invalid username/ password')
-            return redirect(url_for('login'))
-
+        user = db.session.execute(db.select(UserModel).filter_by(username=username)).scalar_one_or_none()
+        if user and check_password_hash(user.password, password):
+            session["user_id"] = user.id
+            return redirect(url_for("home"))
+        return redirect(url_for("login"))
     return render_template('login.html')
 
 #logout route
 @app.route('/logout')
 def logout():
     session.clear()  #to log out the user
-    flash('Logged out!')
     return redirect(url_for('home'))
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
     app.run(debug=True, port=8000, use_reloader=True)

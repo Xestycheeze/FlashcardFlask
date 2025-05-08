@@ -5,8 +5,8 @@
 {% block content %}
 <h1>This is our Home Page</h1>
 
-{% if session.get('username') %}
-    <p>You are logged in as {{ session['username'] }}</p>
+{% if session.get('user_id') %}
+    <p>You are logged in as {{ user.username }}</p>
 {% endif %}
 
 <p>Testing if flask can load data queried from DB to the frontend. Any found user data will be listed in the following table below</p>
