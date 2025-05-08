@@ -18,6 +18,7 @@ db.init_app(app)
 @app.route('/')
 def home():
     user_id = session.get("user_id")
+    user = None
     if user_id:
         user = db.session.execute(
             db.select(UserModel).where(UserModel.id == user_id)
