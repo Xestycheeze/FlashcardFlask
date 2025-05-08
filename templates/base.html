@@ -10,11 +10,33 @@
     </head>
     <body>
         <nav class="navigation-box">
-            <li><a href="/">Home</a></li>
-            <!--
-            <li><a href="/sets">Sets</a></li>
-            -->
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('show_sets') }}">View Sets</a></li>
+                <li><a href="{{ url_for('create_sets') }}">Create Set</a></li>
+                <li><a href="{{ url_for('create_cards') }}">Create Card</a></li>
+
+                {% if session.get('username') %}
+                    <li>Welcome, {{ session['username'] }}</li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+                {% endif %}
+            </ul>
         </nav>
+
+        <!-- show flash messages -->
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul>
+              {% for message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
         {% block content %}
         {% endblock %}
     </body>

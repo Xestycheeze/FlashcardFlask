@@ -1,16 +1,25 @@
 {% extends "base.html" %}
 
-{% block title %}Create Cards{% endblock %}
+{% block title %}Create Card{% endblock %}
 
 {% block content %}
-<h1>This is our Create Cards page</h1>
-<form action="/cards/create_cards" method="POST">
-    <label for="front">Front (Question):</label>
-    <input type="text" id="front" name="front" required>
-  
-    <label for="back">Back (Answer):</label>
-    <input type="text" id="back" name="back" required>
-  
-    <button type="submit">Create Flashcard</button>
-</form>
+<h1>Create a Flashcard</h1>
+
+{% if no_set %}
+    <p>Create your set below:</p>
+    <a href="{{ url_for('create_sets') }}">
+        <button>Create Set</button>
+    </a>
+{% else %}
+    <form action="/create_cards" method="POST">
+        <label for="front">Front (Question):</label>
+        <input type="text" id="front" name="front" required><br>
+
+        <label for="back">Back (Answer):</label>
+        <input type="text" id="back" name="back" required><br>
+
+        <button type="submit">Create Flashcard</button>
+    </form>
+{% endif %}
+
 {% endblock %}
