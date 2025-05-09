@@ -3,3 +3,120 @@ html {
     padding: 0px;
     font-family: Helvetica, Arial;
 }
+/* base */
+body {
+    background-color: #282b30;
+    color: #FFFBF1;
+    font-family: 'Barlow', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.navigation-box {
+    background-color: #424549;
+    border-radius: 15px;
+    padding: 15px;
+}
+
+.nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.nav-links > li:not(.auth-container) {
+    margin-right: 20px;
+}
+
+.nav-links a {
+    color: #FFFBF1;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+.nav-links a.page {
+    text-decoration: underline;
+}
+
+.auth-container {
+    margin-left: auto;
+    display: flex;
+    gap: 20px;
+}
+
+.flash-messages {
+    color: #FFFBF1;
+    list-style: none;
+    padding: 0;
+    margin: 20px;
+}
+/* signup, login, etc */
+.submit {
+    border-radius:		30px;
+    font-size: 			14px;
+    padding: 			3px;
+}
+.middle {
+    text-align:			center;
+}
+h1.middle {
+    padding: 20px;
+}
+.middle input {
+    border-radius:		30px;
+    font-size: 			14px;
+    padding: 			3px;
+    margin-top:         25px;
+}
+.middle button {
+    margin-top: 20px;
+    padding: 5px;
+}
+
+.small {
+    color: #FFFBF1;
+    text-decoration: none;
+    font-size:			15px;
+    padding: 10px;
+}
+/* set table, display data */
+.set table {
+    background-color: #424549;
+    border-collapse: collapse;
+    margin: 10px;
+    width: 50%;
+    border-radius: 8px;
+    overflow: hidden;
+}	
+
+.set th, .set td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #282b30;
+}
+
+.set th {
+    background-color: #36393e;
+    font-weight: bold;
+}
+/* cards */
+.card table{
+    background-color: #424549;
+    border-collapse: collapse;
+    margin: 30px;
+    width: 20%;
+    border-radius: 8px;
+    font-size: 20px;
+    overflow: hidden;
+}
+.card th, .card td {
+    padding: 50px;
+    text-align: center;
+    border: 1px solid #282b30;
+}
+
+.card th {
+    background-color: #36393e;
+    font-weight: bold;
+}

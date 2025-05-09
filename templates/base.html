@@ -9,35 +9,36 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     </head>
     <body>
-        <nav class="navigation-box">
-            <ul>
-                <li><a href="{{ url_for('home') }}">Home</a></li>
-                <li><a href="{{ url_for('show_sets') }}">View Sets</a></li>
-                <li><a href="{{ url_for('create_sets') }}">Create Set</a></li>
-                <li><a href="{{ url_for('create_cards') }}">Create Card</a></li>
-
+      <nav class="navigation-box">
+        <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('show_sets') }}">View Sets</a></li>
+            <li><a href="{{ url_for('create_sets') }}">Create Set</a></li>
+            <li><a href="{{ url_for('create_cards') }}">Create Card</a></li>
+            
+            <li class="auth-container">
                 {% if session.get('user_id') %}
-
-                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    <a href="{{ url_for('logout') }}">Logout</a>
                 {% else %}
-                    <li><a href="{{ url_for('login') }}">Login</a></li>
-                    <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a href="{{ url_for('signup') }}">Sign Up</a>
                 {% endif %}
-            </ul>
-        </nav>
-
-        <!-- show flash messages -->
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <ul>
-              {% for message in messages %}
-                <li>{{ message }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
-
-        {% block content %}
-        {% endblock %}
-    </body>
+            </li>
+        </ul>
+    </nav>
+  
+      <!-- show flash messages -->
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="flash-messages">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+  
+      {% block content %}
+      {% endblock %}
+  </body>
 </html>

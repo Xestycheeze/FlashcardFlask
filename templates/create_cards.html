@@ -3,21 +3,19 @@
 {% block title %}Create Card{% endblock %}
 
 {% block content %}
-<h1>Create a Flashcard</h1>
+<h1 class="middle">Create a Flashcard</h1>
 
 {% if no_set %}
-    <p>Create a set before creating your first flashcard!</p>
-    <a href="{{ url_for('create_sets') }}">
-        <button>Create Set</button>
-    </a>
+    <p class="middle">Create a set before creating your first flashcard!</p>
+    <button class="middle" href="{{ url_for('create_sets') }}">Create Set</button>
 {% else %}
-    <form action="/create_cards" method="POST">
+    <form class="middle" action="/create_cards" method="POST">
         <label for="front">Front (Question):</label>
         <input type="text" id="front" name="front" required><br>
 
         <label for="back">Back (Answer):</label>
         <input type="text" id="back" name="back" required><br>
-
+        <br />
         <label for="set_id">Choose the set this flashcard will be in:</label>
         <select id="set_id" name="set_id">
             {% for item in user_sets %}

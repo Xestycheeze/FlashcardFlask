@@ -4,12 +4,14 @@
 
 {% block content %}
 <h1>Cards in {{ set_name }}</h1>
-<ul>
+    <a class="small" href="{{ url_for('create_cards') }}">Add a new card</a>
     {% for card in cards %}
-        <li><strong>Q:</strong> {{ card.front }} | <strong>A:</strong> {{ card.back }}</li>
+    <div class="card">
+        <table>
+            <tr><th><strong>Q:</strong> {{ card.front }}</th></tr> <tr><td><strong>A:</strong> {{ card.back }}</td></tr>
+        </table>
+    </div>
     {% else %}
-        <li>No cards in this set</li>
+        <p class="small">No cards in this set</p>
     {% endfor %}
-</ul>
-<a href="{{ url_for('create_cards') }}">Add a new card</a>
 {% endblock %}

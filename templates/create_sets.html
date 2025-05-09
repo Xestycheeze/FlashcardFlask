@@ -3,11 +3,11 @@
 {% block title %}Create Sets{% endblock %}
 
 {% block content %}
-<h1>Create Sets</h1>
-<form action="/create_set" method="POST">
+<h1 class="middle">Create Sets</h1>
+<form action="/create_set" method="POST" class="middle">
     <label for="name">Name:</label>
     <input type="text" id="name" name="name" required>
-  
+    <br />
     <button type="submit">Create Flashcard</button>
 </form>
 {% endblock %}
