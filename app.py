@@ -32,15 +32,17 @@ def home():
 #view sets from our databse
 @app.route('/sets', methods=['GET'])
 def show_sets():
-    all_sets = SetModel.query.all()
-    return render_template("sets.html", sets=all_sets)
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+    user_sets = SetModel.query.filter_by(user_id=session.get("user_id")).all()
+    return render_template("sets.html", sets=user_sets)
 
 #create a new set
 @app.route('/create_set', methods=['GET', 'POST'])
 def create_sets():
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
     if request.method == 'POST':
-        if not session.get("user_id"):
-            return redirect(url_for("login"))
         user = db.session.execute(db.select(UserModel).where(UserModel.id == session.get("user_id"))).scalar_one_or_none()
         name = request.form.get('name')
         new_set = SetModel(name=name, user_id=user.id)
@@ -58,22 +60,29 @@ def show_set_cards(set_id):
 #create a new card for the 1st set
 @app.route('/create_cards', methods=['GET', 'POST'])
 def create_cards():
-    first_set = SetModel.query.first()
-    no_set = False #at least we have 1 set
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+    user = db.session.execute(db.select(UserModel).where(UserModel.id == session.get("user_id"))).scalar_one_or_none()
+    print(user)
+    user_sets = SetModel.query.filter_by(user_id=user.id).all()
 
-    if not first_set:
-        no_set = True
+    no_set = True # query yields no sets
+
+    if len(user_sets) > 0:
+        no_set = False
+        first_set = user_sets[0]
 
     if request.method == 'POST' and not no_set:
         front = request.form.get('front')
         back = request.form.get('back')
+        set_id = request.form.get('set_id')
         
-        new_card = CardModel(front=front, back=back, set_id=first_set.id)
+        new_card = CardModel(front=front, back=back, set_id=set_id)
         db.session.add(new_card)
         db.session.commit()
-        return redirect(url_for('show_set_cards', set_id=first_set.id))
+        return redirect(url_for('show_set_cards', set_id=set_id))
 
-    return render_template("create_cards.html", no_set=no_set)
+    return render_template("create_cards.html", no_set=no_set, user_sets=user_sets)
 
 #signup route
 @app.route('/signup', methods=['GET', 'POST'])

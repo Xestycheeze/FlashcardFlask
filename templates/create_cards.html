@@ -6,7 +6,7 @@
 <h1>Create a Flashcard</h1>
 
 {% if no_set %}
-    <p>Create your set below:</p>
+    <p>Create a set before creating your first flashcard!</p>
     <a href="{{ url_for('create_sets') }}">
         <button>Create Set</button>
     </a>
@@ -17,6 +17,13 @@
 
         <label for="back">Back (Answer):</label>
         <input type="text" id="back" name="back" required><br>
+
+        <label for="set_id">Choose the set this flashcard will be in:</label>
+        <select id="set_id" name="set_id">
+            {% for item in user_sets %}
+                <option value="{{ item.id }}">{{ item.name }}</option>
+            {% endfor %}
+        </select><br>
 
         <button type="submit">Create Flashcard</button>
     </form>
