@@ -4,10 +4,21 @@
 
 {% block content %}
 <h1>This is our Home Page</h1>
-    <p>Testing if flask can load data queried from DB to the frontend. Any found user data will be listed in the following table below</p>
+
+{% if session.get('user_id') %}
+    <p>You are logged in as {{ user.username }}</p>
+{% endif %}
+
+<p>Testing if flask can load data queried from DB to the frontend. Any found user data will be listed in the following table below</p>
+
+<p>List of users:</p>
 <table>
     <thead>
-
+    <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Fullname</th>
+    </tr>
     </thead>
     <tbody>
     {% for data in users %}

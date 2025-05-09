@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Cards in {{ set_name }}{% endblock %}
+
+{% block content %}
+<h1>Cards in {{ set_name }}</h1>
+<ul>
+    {% for card in cards %}
+        <li><strong>Q:</strong> {{ card.front }} | <strong>A:</strong> {{ card.back }}</li>
+    {% else %}
+        <li>No cards in this set</li>
+    {% endfor %}
+</ul>
+<a href="{{ url_for('create_cards') }}">Add a new card</a>
+{% endblock %}
