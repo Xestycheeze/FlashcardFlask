@@ -1,8 +1,7 @@
 import pytest
 from app import app
 from db import db
-from flask import request
-from models import SetModel
+from models import SetModel, CardModel
 
 @pytest.fixture
 def client():
@@ -32,6 +31,10 @@ def test_create_set(client):
     res = client.get('/sets')
     assert b'set_name' in res.data
 
+    # check db
+    set_obj = SetModel.query.filter_by(name='set_name_a').first()
+    assert set_obj is not None
+
 def test_create_card(client):
     signup(client, 'b', 'b b', 'b')
     login(client, 'b', 'b')
@@ -46,6 +49,13 @@ def test_create_card(client):
     client.post('/create_cards', data={'front': 'b', 'back': 'b', 'set_id': set_id}, follow_redirects=True)
     res = client.get(f'/sets/set/{set_id}')
     assert b'<li><strong>Q:</strong> b | <strong>A:</strong> b</li>' in res.data
+
+    # check db
+    set_obj = SetModel.query.filter_by(name='set_name_b').first()
+    assert set_obj is not None
+
+    card_obj = CardModel.query.filter_by(front='b').first()
+    assert card_obj is not None
 
 def test_exclusive_cards_sets(client):
     # sign in first user
@@ -82,3 +92,16 @@ def test_exclusive_cards_sets(client):
     res = client.get(f'/sets/set/{set_id}')
     assert b'<li><strong>Q:</strong> c | <strong>A:</strong> c</li>' not in res.data
     assert b'<li><strong>Q:</strong> d | <strong>A:</strong> d</li>' in res.data
+
+    # check db
+    set_obj = SetModel.query.filter_by(name='set_name_c').first()
+    assert set_obj is not None
+
+    card_obj = CardModel.query.filter_by(front='c').first()
+    assert card_obj is not None
+
+    set_obj = SetModel.query.filter_by(name='set_name_d').first()
+    assert set_obj is not None
+
+    card_obj = CardModel.query.filter_by(front='d').first()
+    assert card_obj is not None
