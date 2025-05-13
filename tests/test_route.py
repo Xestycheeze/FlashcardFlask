@@ -16,11 +16,11 @@ def client():
     with app.test_client() as client:
         yield client
 
-def login(client, username, password):
-    return client.post('/login', data={'username': username, 'password': password}, follow_redirects=True)
-
 def signup(client, username, fullname, password):
     return client.post('/signup', data={'username': username, 'fullname': fullname, 'password': password}, follow_redirects=True)
+
+def login(client, username, password):
+    return client.post('/login', data={'username': username, 'password': password}, follow_redirects=True)
 
 def test_failed_login(client):
     res = client.post('/login', data={'username': 'invalid', 'password': 'wrong'})
