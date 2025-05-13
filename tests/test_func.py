@@ -6,8 +6,8 @@ from models import SetModel, CardModel
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
-    # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-    # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.secret_key = 'test_secret'
 
     with app.app_context():
