@@ -27,6 +27,7 @@ def test_create_set(client):
     signup(client, 'a', 'a a', 'a')
     login(client, 'a', 'a')
 
+    # check db for user
     user_db = UserModel.query.filter_by(username='a')
     assert user_db is not None
 
@@ -34,7 +35,7 @@ def test_create_set(client):
     res = client.get('/sets')
     assert b'set_name' in res.data
 
-    # check db
+    # check db for set
     set_obj = SetModel.query.filter_by(name='set_name_a').first()
     assert set_obj is not None
 
@@ -56,7 +57,7 @@ def test_create_card(client):
     res = client.get(f'/sets/set/{set_id}')
     assert b'<li><strong>Q:</strong> b | <strong>A:</strong> b</li>' in res.data
 
-    # check db
+    # check db for set, card
     set_obj = SetModel.query.filter_by(name='set_name_b').first()
     assert set_obj is not None
 
@@ -102,10 +103,11 @@ def test_exclusive_cards_sets(client):
 
     client.post('/create_cards', data={'front': 'd', 'back': 'd', 'set_id': set_id}, follow_redirects=True)
     res = client.get(f'/sets/set/{set_id}')
+    # check if user: c persists
     assert b'<li><strong>Q:</strong> c | <strong>A:</strong> c</li>' not in res.data
     assert b'<li><strong>Q:</strong> d | <strong>A:</strong> d</li>' in res.data
 
-    # check db
+    # check db for set, card
     set_obj = SetModel.query.filter_by(name='set_name_c').first()
     assert set_obj is not None
 
