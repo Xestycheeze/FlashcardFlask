@@ -1,7 +1,7 @@
 import pytest
 from app import app
 from db import db
-from models import SetModel, CardModel
+from models import SetModel, CardModel, UserModel
 
 @pytest.fixture
 def client():
@@ -27,6 +27,9 @@ def test_create_set(client):
     signup(client, 'a', 'a a', 'a')
     login(client, 'a', 'a')
 
+    user_db = UserModel.query.filter_by(username='a')
+    assert user_db is not None
+
     client.post('/create_set', data={'name': 'set_name_a'}, follow_redirects=True)
     res = client.get('/sets')
     assert b'set_name' in res.data
@@ -38,6 +41,9 @@ def test_create_set(client):
 def test_create_card(client):
     signup(client, 'b', 'b b', 'b')
     login(client, 'b', 'b')
+
+    user_db = UserModel.query.filter_by(username='b')
+    assert user_db is not None
 
     client.post('/create_set', data={'name': 'set_name_b'}, follow_redirects=False)
     res = client.get('/sets')
@@ -62,6 +68,9 @@ def test_exclusive_cards_sets(client):
     signup(client, 'c', 'c c', 'c')
     login(client, 'c', 'c')
 
+    user_db = UserModel.query.filter_by(username='c')
+    assert user_db is not None
+
     client.post('/create_set', data={'name': 'set_name_c'}, follow_redirects=True)
     res = client.get('/sets')
     assert b'set_name_c' in res.data
@@ -80,6 +89,9 @@ def test_exclusive_cards_sets(client):
     # sign in second user
     signup(client, 'd', 'd d', 'd')
     login(client, 'd', 'd')
+
+    user_db = UserModel.query.filter_by(username='d')
+    assert user_db is not None
 
     client.post('/create_set', data={'name': 'set_name_d'}, follow_redirects=True)
     res = client.get('/sets')
