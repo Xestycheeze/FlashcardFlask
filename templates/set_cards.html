@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Cards in {{ set_name }}{% endblock %}
+{% block title %}Cards in {{ set_data.name }}{% endblock %}
 
 {% block content %}
-<h1>Cards in {{ set_name }}</h1>
+<h1>Cards in {{ set_data.name }}</h1>
 <ul>
     {% for card in cards %}
-        <li><strong>Q:</strong> {{ card.front }} | <strong>A:</strong> {{ card.back }}</li>
+        <li>
+            <strong>Q:</strong> {{ card.front }} | <strong>A:</strong> {{ card.back }}
+            <a href="{{ url_for('update_card', set_id=set_data.id, card_id=card.id) }}">Edit</a>
+        </li>
     {% else %}
         <li>No cards in this set</li>
     {% endfor %}

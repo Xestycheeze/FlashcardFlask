@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect, request, session, flash
+from flask import Flask, render_template, url_for, redirect, request, session, flash, jsonify
 from pathlib import Path
 from db import db
 from models import UserModel, SetModel, CardModel
@@ -55,12 +55,29 @@ def create_sets():
 @app.route('/sets/set/<int:set_id>', methods=['GET'])
 def show_set_cards(set_id):
     set_data = SetModel.query.get_or_404(set_id)
-    return render_template("set_cards.html", set_name=set_data.name, cards=set_data.cards)
+    return render_template("set_cards.html", set_data=set_data, cards=set_data.cards)
 
-@app.route('/sets/set/<int:set_id>/card/<int:card_id>', methods=['GET', 'PATCH'])
-def update_card(set_id):
+@app.route('/sets/set/<int:set_id>/card/<int:card_id>', methods=['GET', 'POST'])
+def update_card(set_id, card_id):
     set_data = SetModel.query.get_or_404(set_id)
-    return render_template("set_cards.html", set_name=set_data.name, cards=set_data.cards)
+    card = CardModel.query.get_or_404(card_id)
+    if set_data.user_id != session.get("user_id") or card.set_id != set_data.id:
+        return redirect(url_for("show_sets"))
+    user_sets = SetModel.query.filter_by(user_id=session.get("user_id")).all()
+    if request.method == 'POST': # HTML Forms do not support PATCH, so PATCH behaviour is created manually
+        payload = request.form
+        if not payload:
+            return jsonify({"error": "Invalid data"}), 400
+        for key, value in payload.items():
+            if value != "":
+                if key == "set_id":
+                    value = int(value)
+                # This is a PATCH operation
+                setattr(card, key, value)
+        db.session.commit()
+        return redirect(url_for("show_set_cards", set_id=card.set_id))
+
+    return render_template("update_card.html", available_sets=user_sets, card=card)
 
 
 #create a new card for the 1st set
