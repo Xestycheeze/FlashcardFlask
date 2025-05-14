@@ -65,23 +65,23 @@ def create_cards(set_id):
     user = db.session.execute(db.select(UserModel).where(UserModel.id == session.get("user_id"))).scalar_one_or_none()
     user_sets = SetModel.query.filter_by(user_id=user.id).all()
 
-    no_set = True # query yields no sets
-
-    if len(user_sets) > 0:
-        no_set = False
-        first_set = user_sets[0]
-
-    if request.method == 'POST' and not no_set:
+    if request.method == 'POST':
+        
         front = request.form.get('front')
         back = request.form.get('back')
-        # set_id = request.form.get('set_id')
+        set_id = request.form.get('set_id')
         
         new_card = CardModel(front=front, back=back, set_id=set_id)
         db.session.add(new_card)
         db.session.commit()
         return redirect(url_for('show_set_cards', set_id=set_id))
 
-    return render_template("create_cards.html", set_id=set_id)
+    return render_template(
+        "create_cards.html", 
+        user_sets=user_sets, 
+        set_id=set_id, 
+        set=db.session.execute(db.select(SetModel).where(SetModel.id==set_id)).scalar()
+        )
 
 #signup route
 @app.route('/signup', methods=['GET', 'POST'])
