@@ -14,6 +14,8 @@
                 <li><a href="{{ url_for('home') }}">Home</a></li>
                 <li><a href="{{ url_for('show_sets') }}">View Sets</a></li>
                 <li><a href="{{ url_for('create_sets') }}">Create Set</a></li>
+                <li><a href="{{ url_for('create_cards') }}">Create Card</a></li>
+                <li><a href="{{ url_for('select_quiz_sets') }}">Quiz</a></li>
 
                 {% if session.get('user_id') %}
 
