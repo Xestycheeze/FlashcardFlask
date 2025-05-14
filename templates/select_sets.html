@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Select Your Sets for Quiz{% endblock %}
+
+{% block content %}
+<h1>Select Your Flashcard Sets for Quiz</h1>
+
+    {% if sets %}
+        <form method="POST">
+            {% for set in sets %}
+                <input type="checkbox" name="set_ids" value="{{ set.id }}"> {{ set.name }}<br>
+            {% endfor %}
+            <br>
+            <button type="submit">Start Quiz</button>
+        </form>
+    {% else %}
+        <p>There are no sets to start the quiz!</p>
+        <a href="{{ url_for('create_sets') }}"><button>Create a Set</button></a>
+{% endif %}
+
+{% endblock %}
