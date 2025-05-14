@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Quiz{% endblock %}
+
+{% block content %}
+<h1>Quiz</h1>
+
+{% if cards %}
+    <ul>
+        {% for card in cards %}
+            <li style="margin-bottom: 20px;">
+                <strong>Q:</strong> {{ card.front }}<br>
+                
+                <button onclick="toggleAnswer('{{ card.id }}')">Show Answer</button>
+                <!-- to hide the answer -->
+                <div id="answer-{{ card.id }}" style="display: none; margin-top: 5px;">
+                    <strong>A:</strong> {{ card.back }}
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No cards found in the selected sets!</p>
+{% endif %}
+
+
+<a href="{{ url_for('select_quiz_sets') }}">
+    <button>Back</button>
+</a>
+
+<script>
+    function toggleAnswer(cardId) {
+        const answerBox = document.getElementById("answer-" + cardId);
+        if (answerBox.style.display === "none") {
+            answerBox.style.display = "block";
+        } else {
+            answerBox.style.display = "none";
+        }
+    }
+</script>
+
+{% endblock %}
