@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect, request, session, flash, jsonify
+from flask import Flask, render_template, url_for, redirect, request, session, flash
 from pathlib import Path
 from db import db
 from models import UserModel, SetModel, CardModel
@@ -67,7 +67,7 @@ def update_card(set_id, card_id):
     if request.method == 'POST': # HTML Forms do not support PATCH, so PATCH behaviour is created manually
         payload = request.form
         if not payload:
-            return jsonify({"error": "Invalid data"}), 400
+            return redirect(url_for("show_set_cards", set_id=card.set_id))
         for key, value in payload.items():
             if value != "":
                 if key == "set_id":
