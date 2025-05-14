@@ -60,13 +60,15 @@ def show_set_cards(set_id):
     return render_template("set_cards.html", set=set)
 
 #create a new card for the 1st set
+@app.route('/sets/create_cards', methods=['GET', 'POST'])
 @app.route('/sets/<int:set_id>/create_cards', methods=['GET', 'POST'])
-def create_cards(set_id):
+def create_cards(set_id=None):
     if not session.get("user_id"):
         return redirect(url_for("login"))
     user = db.session.execute(db.select(UserModel).where(UserModel.id == session.get("user_id"))).scalar_one_or_none()
     user_sets = SetModel.query.filter_by(user_id=user.id).all()
-
+    if len(user_sets) < 1:
+        return redirect(url_for("create_sets"))
     if request.method == 'POST':
         
         front = request.form.get('front')
