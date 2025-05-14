@@ -57,6 +57,12 @@ def show_set_cards(set_id):
     set_data = SetModel.query.get_or_404(set_id)
     return render_template("set_cards.html", set_name=set_data.name, cards=set_data.cards)
 
+@app.route('/sets/set/<int:set_id>/card/<int:card_id>', methods=['GET', 'PATCH'])
+def update_card(set_id):
+    set_data = SetModel.query.get_or_404(set_id)
+    return render_template("set_cards.html", set_name=set_data.name, cards=set_data.cards)
+
+
 #create a new card for the 1st set
 @app.route('/create_cards', methods=['GET', 'POST'])
 def create_cards():
