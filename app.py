@@ -40,7 +40,7 @@ def show_sets():
     return render_template("sets.html", sets=user_sets)
 
 #create a new set
-@app.route('/create_set', methods=['GET', 'POST'])
+@app.route('/sets/create_set', methods=['GET', 'POST'])
 def create_sets():
     if not session.get("user_id"):
         return redirect(url_for("login"))
@@ -54,27 +54,23 @@ def create_sets():
     return render_template("create_sets.html")
 
 #view cards
-@app.route('/sets/set/<int:set_id>', methods=['GET'])
+@app.route('/sets/<int:set_id>', methods=['GET'])
 def show_set_cards(set_id):
-    set_data = SetModel.query.get_or_404(set_id)
-    return render_template("set_cards.html", set_name=set_data.name, cards=set_data.cards)
+    set = SetModel.query.get_or_404(set_id)
+    return render_template("set_cards.html", set=set)
 
 #create a new card for the 1st set
-@app.route('/create_cards', methods=['GET', 'POST'])
-def create_cards():
+@app.route('/sets/create_cards', methods=['GET', 'POST'])
+@app.route('/sets/<int:set_id>/create_cards', methods=['GET', 'POST'])
+def create_cards(set_id=None):
     if not session.get("user_id"):
         return redirect(url_for("login"))
     user = db.session.execute(db.select(UserModel).where(UserModel.id == session.get("user_id"))).scalar_one_or_none()
-    print(user)
     user_sets = SetModel.query.filter_by(user_id=user.id).all()
-
-    no_set = True # query yields no sets
-
-    if len(user_sets) > 0:
-        no_set = False
-        first_set = user_sets[0]
-
-    if request.method == 'POST' and not no_set:
+    if len(user_sets) < 1:
+        return redirect(url_for("create_sets"))
+    if request.method == 'POST':
+        
         front = request.form.get('front')
         back = request.form.get('back')
         set_id = request.form.get('set_id')
@@ -84,7 +80,12 @@ def create_cards():
         db.session.commit()
         return redirect(url_for('show_set_cards', set_id=set_id))
 
-    return render_template("create_cards.html", no_set=no_set, user_sets=user_sets)
+    return render_template(
+        "create_cards.html", 
+        user_sets=user_sets, 
+        set_id=set_id, 
+        set=db.session.execute(db.select(SetModel).where(SetModel.id==set_id)).scalar()
+        )
 
 #signup route
 @app.route('/signup', methods=['GET', 'POST'])
