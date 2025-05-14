@@ -15,7 +15,11 @@
             <li><a href="{{ url_for('show_sets') }}">View Sets</a></li>
             <li><a href="{{ url_for('create_sets') }}">Create Set</a></li>
             <li><a href="{{ url_for('create_cards') }}">Create Card</a></li>
-            
+
+            <form action="{{ url_for('search') }}" method='get'>
+              <input class='search' placeholder='Search' type='text' name='query'/>
+            </form>
+
             <li class="auth-container">
                 {% if session.get('user_id') %}
                     <a href="{{ url_for('logout') }}">Logout</a>

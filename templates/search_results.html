@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Search Results that contain "{{ query }}"</h2>
+    
+    {% if not results.sets and not results.card and not results.users %}
+        <p>No results found.</p>
+    {% endif %}
+    
+    {% if results.sets %}
+        <h3>Sets</h3>
+        <ul>
+            {% for set in results.sets %}
+                <li>
+                    <a href="{{ url_for('show_set_cards', set_id=set.id) }}">{{ set.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    
+    {% if results.card %}
+        <h3>Cards</h3>
+        <ul>
+            {% for card in results.card %}
+                <li>
+                    <strong>Front:</strong> {{ card.front }}<br>
+                    <strong>Back:</strong> {{ card.back }}<br>
+                    <a href="{{ url_for('show_set_cards', set_id=card.set_id) }}">Go to Set</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if results.users %}
+        <h3>Users</h3>
+        <ul>
+            {% for user in results.users %}
+                <li>
+                    <a>{{ user.username }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+</div>
+{% endblock %}

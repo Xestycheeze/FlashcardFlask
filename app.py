@@ -124,6 +124,35 @@ def logout():
     session.clear()  #to log out the user
     return redirect(url_for('home'))
 
+#search route
+@app.route('/search')
+def search():
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+    query = request.args.get('query', '').strip()
+    
+    if not query:
+        return render_template('search_results.html', results=[], query=query)
+    
+    user_results = UserModel.query.filter(
+        UserModel.username.ilike(f'%{query}%')).all()
+    
+    
+    set_results = SetModel.query.filter(
+        SetModel.name.ilike(f'%{query}%')).filter_by(user_id=session.get("user_id")).all()
+    
+    card_results = CardModel.query.join(SetModel).filter(
+    (CardModel.front.ilike(f'%{query}%') | CardModel.back.ilike(f'%{query}%')),
+    SetModel.user_id == session.get("user_id")).all()
+    
+    results = {
+        'users': user_results,
+        'sets': set_results,
+        'card': card_results
+    }
+    return render_template('search_results.html', results=results, query=query)
+
+
 if __name__ == '__main__':
     with app.app_context():
         db.drop_all()
