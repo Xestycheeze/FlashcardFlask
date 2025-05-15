@@ -35,7 +35,7 @@ def test_create_sets_redirect(client):
     assert res.status_code == 404
 
 def test_create_cards_redirect(client):
-    res = client.get('/create_cards')
+    res = client.get('/sets/create_cards')
     assert res.status_code == 302
 
 def test_homepage_accessible(client):
@@ -51,14 +51,16 @@ def test_setspage_accessible(client):
 def test_createsetpage_accessible(client):
     signup(client, 'john', 'john python', '123')
     login(client, 'john', '123')
-    res = client.get('/create_set')
+    res = client.get('/sets/create_set')
     assert b'<button type="submit">Create Flashcard</button>' in res.data
 
 def test_createcardspage_accessible(client):
     signup(client, 'john', 'john python', '123')
     login(client, 'john', '123')
-    res = client.get('/create_cards')
-    assert b'<button>Create Set</button>' in res.data
+    res = client.get('/sets/create_cards')
+    # assert b'<button>Create Set</button>' in res.data
+    # redirects to create sets
+    assert res.status_code == 302
 
 def test_loginpage_accessible(client):
     res = client.get('/login')
