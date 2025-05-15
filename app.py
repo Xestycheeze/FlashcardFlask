@@ -19,31 +19,23 @@ db.init_app(app)
 @app.route('/home')
 @app.route('/')
 def home():
-    user_id = session.get("user_id")
-    user = None
-    if user_id:
-        user = db.session.execute(
-            db.select(UserModel).where(UserModel.id == user_id)
-        ).scalar_one_or_none()
     context = {
-        "user" : user,
-        "users": UserModel.query.all()
+        "user" : UserModel.get_loggedin_user(),
+        "users": UserModel.get_all_users(),
     }
     return render_template("home.html", **context)
 
 #view sets from our databse
 @app.route('/sets', methods=['GET'])
 def show_sets():
-    if not session.get("user_id"):
-        return redirect(url_for("login"))
-    user_sets = SetModel.query.filter_by(user_id=session.get("user_id")).all()
-    return render_template("sets.html", sets=user_sets)
+    if session.get("user_id"):
+        user_sets = SetModel.query.filter_by(user_id=session.get("user_id")).all()
+        return render_template("sets.html", sets=user_sets)
+    return redirect(url_for("login"))
 
 #create a new set
 @app.route('/sets/create_set', methods=['GET', 'POST'])
 def create_sets():
-    if not session.get("user_id"):
-        return redirect(url_for("login"))
     if request.method == 'POST':
         user = db.session.execute(db.select(UserModel).where(UserModel.id == session.get("user_id"))).scalar_one_or_none()
         name = request.form.get('name')
@@ -51,7 +43,10 @@ def create_sets():
         db.session.add(new_set)
         db.session.commit()
         return redirect(url_for('show_sets'))
-    return render_template("create_sets.html")
+    
+    if session.get("user_id"):
+        return render_template("create_sets.html")
+    return redirect(url_for("login"))
 
 #view cards
 @app.route('/sets/<int:set_id>', methods=['GET'])
@@ -63,29 +58,28 @@ def show_set_cards(set_id):
 @app.route('/sets/create_cards', methods=['GET', 'POST'])
 @app.route('/sets/<int:set_id>/create_cards', methods=['GET', 'POST'])
 def create_cards(set_id=None):
-    if not session.get("user_id"):
-        return redirect(url_for("login"))
-    user = db.session.execute(db.select(UserModel).where(UserModel.id == session.get("user_id"))).scalar_one_or_none()
-    user_sets = SetModel.query.filter_by(user_id=user.id).all()
-    if len(user_sets) < 1:
-        return redirect(url_for("create_sets"))
     if request.method == 'POST':
-        
         front = request.form.get('front')
         back = request.form.get('back')
         set_id = request.form.get('set_id')
-        
         new_card = CardModel(front=front, back=back, set_id=set_id)
         db.session.add(new_card)
         db.session.commit()
         return redirect(url_for('show_set_cards', set_id=set_id))
-
-    return render_template(
-        "create_cards.html", 
-        user_sets=user_sets, 
-        set_id=set_id, 
-        set=db.session.execute(db.select(SetModel).where(SetModel.id==set_id)).scalar()
-        )
+    
+    if session.get("user_id"):
+        user = UserModel.get_loggedin_user()
+        user_sets = SetModel.query.filter_by(user_id=user.id).all()
+        if len(user_sets) < 1:
+            return redirect(url_for("create_sets"))
+        return render_template(
+            "create_cards.html", 
+            user_sets=user_sets, 
+            set_id=set_id, 
+            set=db.session.execute(db.select(SetModel).where(SetModel.id==set_id)).scalar()
+            )
+        
+    return redirect(url_for("login"))
 
 #signup route
 @app.route('/signup', methods=['GET', 'POST'])
@@ -130,35 +124,31 @@ def logout():
 #quiz routes/select the sets
 @app.route('/quiz/select_sets', methods=['GET', 'POST'])
 def select_quiz_sets():
-    if not session.get("user_id"):
-        return redirect(url_for("login"))
-
-    user_sets = SetModel.query.filter_by(user_id=session["user_id"]).all()
-
     if request.method == 'POST':
         selected_set_ids = request.form.getlist('set_ids')
         return redirect(url_for('start_quiz', set_ids=','.join(selected_set_ids)))
-
-    return render_template("select_sets.html", sets=user_sets)
+    
+    if session.get("user_id"):
+        user_sets = SetModel.query.filter_by(user_id=session["user_id"]).all()
+        return render_template("select_sets.html", sets=user_sets)
+    return redirect(url_for("login"))
 
 #quiz routes/quiz
 @app.route('/quiz/start')
 def start_quiz():
-    if not session.get("user_id"):
-        return redirect(url_for("login"))
+    if session.get("user_id"):
+        set_ids = request.args.get('set_ids', '')
+        id_list = [int(sid) for sid in set_ids.split(',') if sid.isdigit()]
+        cards = []
+        for set_id in id_list:
+            selected_set = SetModel.query.filter_by(id=set_id, user_id=session["user_id"]).first()
+            if selected_set:
+                cards.extend(selected_set.cards)
 
-    set_ids = request.args.get('set_ids', '')
-    id_list = [int(sid) for sid in set_ids.split(',') if sid.isdigit()]
-
-    cards = []
-    for set_id in id_list:
-        selected_set = SetModel.query.filter_by(id=set_id, user_id=session["user_id"]).first()
-        if selected_set:
-            cards.extend(selected_set.cards)
-
-    random.shuffle(cards)
-    return render_template("quiz.html", cards=cards)
-
+        random.shuffle(cards)
+        return render_template("quiz.html", cards=cards)
+    
+    return redirect(url_for("login"))
 
 if __name__ == '__main__':
     with app.app_context():

@@ -164,3 +164,6 @@ def test_parent_automation(client):
     assert f'<option value="{set_y}" selected' in html
     assert f'<option value="{set_e}" selected' not in html
     assert f'<option value="{set_f}"' not in html
+    
+def test_update_card(client):
+    pass

@@ -1,6 +1,7 @@
 from db import db
 from sqlalchemy import String, Integer
 from sqlalchemy.orm import mapped_column, relationship
+from flask import session
 
 class UserModel(db.Model):
     __tablename__ = 'Users'
@@ -15,3 +16,14 @@ class UserModel(db.Model):
 
     def __repr__(self):
         return f'<User {self.username}>'
+    
+    @classmethod
+    def get_loggedin_user(cls):
+        user_id = session.get("user_id")
+        if not user_id:
+            return None
+        return db.session.execute(db.select(cls).where(cls.id==user_id)).scalar()
+    
+    @classmethod
+    def get_all_users(cls):
+        return db.session.execute(db.select(cls)).scalars()
