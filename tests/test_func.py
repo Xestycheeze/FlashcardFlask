@@ -45,6 +45,10 @@ def create_set_and_card(client, name, cards):
         card_ids.append(card.id)
     return set_id, card_ids
 
+def update_card(client):
+    return client.post('/sets/<int:set_id>/cards/<int:card_id>', data={})
+
+
 # NOTE: tests start here
 # create set
 def test_create_set(client):
@@ -183,17 +187,22 @@ def test_update_card(client):
     signup(client, 'g', 'g g', 'g')
     login(client, 'g', 'g')
 
-    set_id_x, card_ids_x = create_set_and_card(client, 'set_name_x', [('x1', 'x1'), ('x2', 'x2'), ('x3', 'x3'), ('x4', 'y4')])
+    set_id_x, card_ids_x = create_set_and_card(client, 'set_name_x', [('x1', 'x1'), ('x2', 'x2'), ('x3', 'x3'), ('x4', 'x4')])
 
     res = client.get(f'/sets/{set_id_x}')
     assert b'<strong>Q:</strong> x1' in res.data
     assert b'<strong>Q:</strong> x2' in res.data
     assert b'<strong>Q:</strong> x3' in res.data
+    # html = decode_html(res)
+    # print(html)
+    # assert b'<strong>Q:</strong> x3' not in res.data
 
     # update 2nd card
-    client.post(f'/sets/{set_id_x}/card/{card_ids_x[1]}', data={'front': 'xx2', 'back': 'xx2'})
+    client.post(f'/sets/{set_id_x}/cards/{card_ids_x[1]}', data={'front': 'xx2', 'back': 'xx2'})
 
     res = client.get(f'/sets/{set_id_x}')
+    # html = decode_html(res)
+    # print(html)
     assert b'<strong>Q:</strong> xx2' in res.data
 
 
@@ -208,6 +217,8 @@ def test_delete_card(client):
     assert b'<strong>Q:</strong> h1' in res.data
     assert b'<strong>Q:</strong> h2' in res.data
     assert b'<strong>Q:</strong> h3' in res.data
+
+    print(card_ids_h)
     
     # check db for all cards
     card_1 = CardModel.query.filter_by(id=card_ids_h[0]).first()
@@ -218,9 +229,12 @@ def test_delete_card(client):
     assert card_2 is not None
     assert card_3 is not None
     assert card_4 is not None
+
+    html = decode_html(res)
+    print(html)
     
     # check non-existent card 5
-    card_5 = CardModel.query.filter_by(id=card_ids_h[4]).first()
+    card_5 = CardModel.query.filter_by(id=999).first()
     assert card_5 is None
 
     # delete 2nd card
