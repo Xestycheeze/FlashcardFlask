@@ -43,7 +43,7 @@ def create_sets():
         db.session.add(new_set)
         db.session.commit()
         return redirect(url_for('show_sets'))
-    
+
     if session.get("user_id"):
         return render_template("create_sets.html")
     return redirect(url_for("login"))
@@ -51,8 +51,31 @@ def create_sets():
 #view cards
 @app.route('/sets/<int:set_id>', methods=['GET'])
 def show_set_cards(set_id):
-    set = SetModel.query.get_or_404(set_id)
-    return render_template("set_cards.html", set=set)
+    set_data = SetModel.query.get_or_404(set_id)
+    return render_template("set_cards.html", set_data=set_data, cards=set_data.cards)
+
+@app.route('/sets/<int:set_id>/cards/<int:card_id>', methods=['GET', 'POST'])
+def update_card(set_id, card_id):
+    set_data = SetModel.query.get_or_404(set_id)
+    card = CardModel.query.get_or_404(card_id)
+    if set_data.user_id != session.get("user_id") or card.set_id != set_data.id:
+        return redirect(url_for("show_sets"))
+    user_sets = SetModel.query.filter_by(user_id=session.get("user_id")).all()
+    if request.method == 'POST': # HTML Forms do not support PATCH, so PATCH behaviour is created manually
+        payload = request.form
+        if not payload:
+            return redirect(url_for("show_set_cards", set_id=card.set_id))
+        for key, value in payload.items():
+            if value != "":
+                if key == "set_id":
+                    value = int(value)
+                # This is a PATCH operation
+                setattr(card, key, value)
+        db.session.commit()
+        return redirect(url_for("show_set_cards", set_id=card.set_id))
+
+    return render_template("update_card.html", available_sets=user_sets, card=card)
+
 
 #create a new card for the 1st set
 @app.route('/sets/create_cards', methods=['GET', 'POST'])
@@ -66,19 +89,19 @@ def create_cards(set_id=None):
         db.session.add(new_card)
         db.session.commit()
         return redirect(url_for('show_set_cards', set_id=set_id))
-    
+
     if session.get("user_id"):
         user = UserModel.get_loggedin_user()
         user_sets = SetModel.query.filter_by(user_id=user.id).all()
         if len(user_sets) < 1:
             return redirect(url_for("create_sets"))
         return render_template(
-            "create_cards.html", 
-            user_sets=user_sets, 
-            set_id=set_id, 
+            "create_cards.html",
+            user_sets=user_sets,
+            set_id=set_id,
             set=db.session.execute(db.select(SetModel).where(SetModel.id==set_id)).scalar()
             )
-        
+
     return redirect(url_for("login"))
 
 #signup route
@@ -127,7 +150,7 @@ def select_quiz_sets():
     if request.method == 'POST':
         selected_set_ids = request.form.getlist('set_ids')
         return redirect(url_for('start_quiz', set_ids=','.join(selected_set_ids)))
-    
+
     if session.get("user_id"):
         user_sets = SetModel.query.filter_by(user_id=session["user_id"]).all()
         return render_template("select_sets.html", sets=user_sets)
@@ -147,7 +170,7 @@ def start_quiz():
 
         random.shuffle(cards)
         return render_template("quiz.html", cards=cards)
-    
+
     return redirect(url_for("login"))
 
 if __name__ == '__main__':
