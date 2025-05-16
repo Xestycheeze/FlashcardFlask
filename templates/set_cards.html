@@ -4,7 +4,9 @@
 
 {% block content %}
 <h1>Cards in {{ set.name }}</h1>
-    <a class="small" href="{{ url_for('create_cards') }}">Add a new card</a>
+    <a class="btn four" href="{{ url_for('create_cards', set_id=set.id) }}">
+        Add a new card
+    </a>
     {% for card in set.cards %}
     <div class="card">
         <table>
@@ -15,7 +17,4 @@
         <p class="small">No cards in this set</p>
     {% endfor %}
 </ul>
-<a href="{{ url_for('create_cards', set_id=set.id) }}">
-    Add a new card
-</a>
 {% endblock %}
