@@ -104,6 +104,19 @@ def create_cards(set_id=None):
 
     return redirect(url_for("login"))
 
+@app.route('/delete/card/<int:card_id>', methods=['POST'])
+def delete_card(card_id):
+    flashcard = CardModel.query.get_or_404(card_id)
+    try:
+        set_id = flashcard.set_id
+        db.session.delete(flashcard)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return redirect(url_for('show_sets'))
+    return redirect(url_for('show_set_cards', set_id=set_id))
+
+
 #signup route
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
