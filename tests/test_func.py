@@ -17,12 +17,40 @@ def client():
     with app.test_client() as client:
         yield client
 
+# NOTE: helper functions
 def signup(client, username, fullname, password):
     return client.post('/signup', data={'username': username, 'fullname': fullname, 'password': password}, follow_redirects=True)
 
 def login(client, username, password):
     return client.post('/login', data={'username': username, 'password': password}, follow_redirects=True)
 
+def decode_html(res):
+    html = res.data.decode().replace('\n', '').replace('  ', ' ')
+    return html
+
+def create_set(client, name):
+    client.post('/sets/create_set', data={'name': name}, follow_redirects=True)
+    user_set = SetModel.query.filter_by(name=name).first()
+    set_id = user_set.id
+    return set_id
+
+def create_set_and_card(client, name, cards):
+    client.post('/sets/create_set', data={'name': name}, follow_redirects=True)
+    user_set = SetModel.query.filter_by(name=name).first()
+    set_id = user_set.id
+    card_ids = []
+    for front, back in cards:
+        client.post(f'/sets/{set_id}/create_cards', data={'front': front, 'back': back, 'set_id': set_id}, follow_redirects=True)
+        card = CardModel.query.filter_by(set_id=set_id, front=front, back=back).first()
+        card_ids.append(card.id)
+    return set_id, card_ids
+
+def update_card(client):
+    return client.post('/sets/<int:set_id>/cards/<int:card_id>', data={})
+
+
+# NOTE: tests start here
+# create set
 def test_create_set(client):
     signup(client, 'a', 'a a', 'a')
     login(client, 'a', 'a')
@@ -31,14 +59,16 @@ def test_create_set(client):
     user_db = UserModel.query.filter_by(username='a')
     assert user_db is not None
 
-    client.post('/create_set', data={'name': 'set_name_a'}, follow_redirects=True)
+    create_set(client, 'set_name_a')
     res = client.get('/sets')
-    assert b'set_name' in res.data
+    assert b'set_name_a' in res.data
 
     # check db for set
     set_db = SetModel.query.filter_by(name='set_name_a').first()
     assert set_db is not None
 
+
+# create card
 def test_create_card(client):
     signup(client, 'b', 'b b', 'b')
     login(client, 'b', 'b')
@@ -46,24 +76,20 @@ def test_create_card(client):
     user_db = UserModel.query.filter_by(username='b')
     assert user_db is not None
 
-    client.post('/create_set', data={'name': 'set_name_b'}, follow_redirects=False)
-    res = client.get('/sets')
-    assert b'set_name_b' in res.data
-    
-    user_set = SetModel.query.filter_by(name='set_name_b').first()
-    set_id = user_set.id
+    set_id, card_ids = create_set_and_card(client, 'set_name_b', [('b', 'b')])
 
-    client.post('/create_cards', data={'front': 'b', 'back': 'b', 'set_id': set_id}, follow_redirects=True)
-    res = client.get(f'/sets/set/{set_id}')
-    assert b'<li><strong>Q:</strong> b | <strong>A:</strong> b</li>' in res.data
+    res = client.get(f'/sets/{set_id}')
+    assert b'<strong>Q:</strong> b' in res.data
 
     # check db for set, card
-    set_db = SetModel.query.filter_by(name='set_name_b').first()
+    set_db = SetModel.query.filter_by(id=set_id).first()
     assert set_db is not None
 
     card_db = CardModel.query.filter_by(front='b').first()
     assert card_db is not None
 
+
+# user exclusivity
 def test_exclusive_cards_sets(client):
     # sign in first user
     signup(client, 'c', 'c c', 'c')
@@ -72,16 +98,13 @@ def test_exclusive_cards_sets(client):
     user_db = UserModel.query.filter_by(username='c')
     assert user_db is not None
 
-    client.post('/create_set', data={'name': 'set_name_c'}, follow_redirects=True)
+    set_id_c, card_ids_c = create_set_and_card(client, 'set_name_c', [('c', 'c')])
+
     res = client.get('/sets')
     assert b'set_name_c' in res.data
 
-    user_set = SetModel.query.filter_by(name='set_name_c').first()
-    set_id = user_set.id
-
-    client.post('/create_cards', data={'front': 'c', 'back': 'c', 'set_id': set_id}, follow_redirects=True)
-    res = client.get(f'/sets/set/{set_id}')
-    assert b'<li><strong>Q:</strong> c | <strong>A:</strong> c</li>' in res.data
+    res = client.get(f'/sets/{set_id_c}')
+    assert b'<strong>Q:</strong> c' in res.data
     
     #logout first user 
     response = client.get('/logout', follow_redirects=False)
@@ -94,28 +117,129 @@ def test_exclusive_cards_sets(client):
     user_db = UserModel.query.filter_by(username='d')
     assert user_db is not None
 
-    client.post('/create_set', data={'name': 'set_name_d'}, follow_redirects=True)
+    set_id_d, card_ids_d = create_set_and_card(client, 'set_name_d', [('d', 'd')])
+
     res = client.get('/sets')
     assert b'set_name_d' in res.data
 
-    user_set = SetModel.query.filter_by(name='set_name_d').first()
-    set_id = user_set.id
-
-    client.post('/create_cards', data={'front': 'd', 'back': 'd', 'set_id': set_id}, follow_redirects=True)
-    res = client.get(f'/sets/set/{set_id}')
+    res = client.get(f'/sets/{set_id_d}')
     # check if user: c persists
-    assert b'<li><strong>Q:</strong> c | <strong>A:</strong> c</li>' not in res.data
-    assert b'<li><strong>Q:</strong> d | <strong>A:</strong> d</li>' in res.data
+    assert b'<strong>Q:</strong> c' not in res.data
+    assert b'<strong>Q:</strong> d' in res.data
 
     # check db for set, card
-    set_db = SetModel.query.filter_by(name='set_name_c').first()
-    assert set_db is not None
+    set_db_c = SetModel.query.filter_by(name='set_name_c').first()
+    assert set_db_c is not None
 
-    card_db = CardModel.query.filter_by(front='c').first()
-    assert card_db is not None
+    card_db_c = CardModel.query.filter_by(front='c').first()
+    assert card_db_c is not None
 
-    set_db = SetModel.query.filter_by(name='set_name_d').first()
-    assert set_db is not None
+    set_db_d = SetModel.query.filter_by(name='set_name_d').first()
+    assert set_db_d is not None
 
-    card_db = CardModel.query.filter_by(front='d').first()
-    assert card_db is not None
+    card_db_d = CardModel.query.filter_by(front='d').first()
+    assert card_db_d is not None
+
+
+#  card parent set automation
+def test_parent_automation(client):
+    signup(client, 'e', 'e e', 'e')
+    login(client, 'e', 'e')
+
+    set_e = create_set(client, 'set_e')
+    set_f = create_set(client, 'set_f')
+
+    res = client.get(f'/sets/{set_e}/create_cards')
+    html = decode_html(res)
+    assert f'<option value="{set_e}" selected' in html
+    assert f'<option value="{set_f}"' in html
+
+    res = client.get(f'/sets/{set_f}/create_cards')
+    html = decode_html(res)
+    assert f'<option value="{set_e}"' in html
+    assert f'<option value="{set_f}" selected' in html
+
+    client.get('/logout', follow_redirects=False)
+
+    signup(client, 'f', 'f f', 'f')
+    login(client, 'f', 'f')
+
+    set_x = create_set(client, 'set_x')
+    set_y = create_set(client, 'set_y')
+
+    res = client.get(f'/sets/{set_x}/create_cards')
+    html = decode_html(res)
+    assert f'<option value="{set_x}" selected' in html
+    assert f'<option value="{set_y}"' in html
+    assert f'<option value="{set_e}" selected' not in html
+    assert f'<option value="{set_f}"' not in html
+
+    res = client.get(f'/sets/{set_y}/create_cards')
+    html = decode_html(res)
+    assert f'<option value="{set_x}"' in html
+    assert f'<option value="{set_y}" selected' in html
+    assert f'<option value="{set_e}" selected' not in html
+    assert f'<option value="{set_f}"' not in html
+    
+
+# update card
+def test_update_card(client):
+    signup(client, 'g', 'g g', 'g')
+    login(client, 'g', 'g')
+
+    set_id_x, card_ids_x = create_set_and_card(client, 'set_name_x', [('x1', 'x1'), ('x2', 'x2'), ('x3', 'x3'), ('x4', 'x4')])
+
+    res = client.get(f'/sets/{set_id_x}')
+    assert b'<strong>Q:</strong> x1' in res.data
+    assert b'<strong>Q:</strong> x2' in res.data
+    assert b'<strong>Q:</strong> x3' in res.data
+    # html = decode_html(res)
+    # print(html)
+    # assert b'<strong>Q:</strong> x3' not in res.data
+
+    # update 2nd card
+    client.post(f'/sets/{set_id_x}/cards/{card_ids_x[1]}', data={'front': 'xx2', 'back': 'xx2'})
+
+    res = client.get(f'/sets/{set_id_x}')
+    # html = decode_html(res)
+    # print(html)
+    assert b'<strong>Q:</strong> xx2' in res.data
+
+
+# delete card
+def test_delete_card(client):
+    signup(client, 'h', 'h h', 'h')
+    login(client, 'h', 'h')
+
+    set_id_h, card_ids_h = create_set_and_card(client, 'set_name_h', [('h1', 'h1'), ('h2', 'h2'), ('h3', 'h3'), ('h4', 'h4')])
+
+    res = client.get(f'/sets/{set_id_h}')
+    assert b'<strong>Q:</strong> h1' in res.data
+    assert b'<strong>Q:</strong> h2' in res.data
+    assert b'<strong>Q:</strong> h3' in res.data
+
+    print(card_ids_h)
+    
+    # check db for all cards
+    card_1 = CardModel.query.filter_by(id=card_ids_h[0]).first()
+    card_2 = CardModel.query.filter_by(id=card_ids_h[1]).first()
+    card_3 = CardModel.query.filter_by(id=card_ids_h[2]).first()
+    card_4 = CardModel.query.filter_by(id=card_ids_h[3]).first()
+    assert card_1 is not None
+    assert card_2 is not None
+    assert card_3 is not None
+    assert card_4 is not None
+
+    html = decode_html(res)
+    print(html)
+    
+    # check non-existent card 5
+    card_5 = CardModel.query.filter_by(id=999).first()
+    assert card_5 is None
+
+    # delete 2nd card
+    client.post(f'/delete/card/{card_ids_h[1]}')
+
+    # verify 2nd card deletion
+    del_card_2 = CardModel.query.filter_by(id=card_ids_h[1]).first()
+    assert del_card_2 is None
