@@ -54,7 +54,7 @@ def show_set_cards(set_id):
     set_data = SetModel.query.get_or_404(set_id)
     return render_template("set_cards.html", set_data=set_data, cards=set_data.cards)
 
-@app.route('/sets/<int:set_id>/card/<int:card_id>', methods=['GET', 'POST'])
+@app.route('/sets/<int:set_id>/cards/<int:card_id>', methods=['GET', 'POST'])
 def update_card(set_id, card_id):
     set_data = SetModel.query.get_or_404(set_id)
     card = CardModel.query.get_or_404(card_id)

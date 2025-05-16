@@ -29,7 +29,7 @@
         // Set the default option to the second option (index 1)
         document.getElementById('flashcard-updater').addEventListener('submit', function(event) {
             event.preventDefault();
-            this.action = `/sets/{{ card.set_id }}/card/{{card.id}}`;
+            this.action = `/sets/{{ card.set_id }}/cards/{{card.id}}`;
             this.submit();
         });
     </script>
