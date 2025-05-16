@@ -1,0 +1,79 @@
+/*flip Card*/
+.flip-card {
+  background-color: transparent;
+  width: 300px;
+  height: 200px;
+  margin: 30px auto;
+
+  /*for the 3D*/
+  perspective: 1000px; 
+  cursor: pointer;
+}
+
+/*create the box*/
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s ease;
+  transform-style: preserve-3d;
+}
+
+/*card Counter*/
+#card-counter {
+  text-align: center;
+  font-size: 1rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+/*flipping rotation*/
+.flip-card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+
+/*navigation*/
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  max-width: 320px;
+  margin: 20px auto;
+}
+
+.nav-buttons button {
+  padding: 8px 16px;
+  font-size: 1rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.nav-buttons button:hover {
+  background-color: #388e3c;
+}

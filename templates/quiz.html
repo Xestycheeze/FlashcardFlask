@@ -2,22 +2,38 @@
 {% block title %}Quiz{% endblock %}
 
 {% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/flip.css') }}">
+
 <h1>Quiz</h1>
 
 {% if cards %}
-    <ul>
-        {% for card in cards %}
-            <li style="margin-bottom: 20px;">
-                <strong>Q:</strong> {{ card.front }}<br>
-                
-                <button onclick="toggleAnswer('{{ card.id }}')">Show Answer</button>
-                <!-- to hide the answer -->
-                <div id="answer-{{ card.id }}" style="display: none; margin-top: 5px;">
-                    <strong>A:</strong> {{ card.back }}
-                </div>
-            </li>
-        {% endfor %}
-    </ul>
+  
+<div id="card-counter">1 out of {{ cards|length }} flashcards</div>
+
+<div class="flip-card" onclick="flipCard()">
+  <div class="flip-card-inner" id="flip-card-inner">
+    <div class="flip-card-front" id="card-front">
+      {{ cards[0].front }}
+    </div>
+    <div class="flip-card-back" id="card-back">
+      {{ cards[0].back }}
+    </div>
+  </div>
+</div>
+
+<div class="nav-buttons">
+  <button onclick="prevCard()">Previous</button>
+  <button onclick="nextCard()">Next</button>
+</div>
+
+
+<div id="flashcard-data" style="display:none;">
+    {% for card in cards %}
+      <div class="card-data" data-front="{{ card.front }}" data-back="{{ card.back }}"></div>
+    {% endfor %}
+  </div>
+
 {% else %}
     <p>No cards found in the selected sets!</p>
 {% endif %}
@@ -27,15 +43,46 @@
     <button>Back</button>
 </a>
 
+
 <script>
-    function toggleAnswer(cardId) {
-        const answerBox = document.getElementById("answer-" + cardId);
-        if (answerBox.style.display === "none") {
-            answerBox.style.display = "block";
-        } else {
-            answerBox.style.display = "none";
-        }
+
+  const cardElements = document.querySelectorAll('.card-data');
+  const cards = Array.from(cardElements).map(el => ({
+    front: el.getAttribute('data-front'),
+    back: el.getAttribute('data-back')
+  }));
+
+  let currentCard = 0;
+  const frontEl = document.getElementById("card-front");
+  const backEl = document.getElementById("card-back");
+  const counterEl = document.getElementById("card-counter");
+  const flipInner = document.getElementById("flip-card-inner");
+
+  function updateCard() {
+    frontEl.textContent = cards[currentCard].front;
+    backEl.textContent = cards[currentCard].back;
+    counterEl.textContent = (currentCard + 1) + " out of " + cards.length + " flashcards";
+    flipInner.classList.remove("flipped");
+  }
+
+  function nextCard() {
+    if (currentCard < cards.length - 1) {
+      currentCard++;
+      updateCard();
     }
+  }
+
+  function prevCard() {
+    if (currentCard > 0) {
+      currentCard--;
+      updateCard();
+    }
+  }
+
+  function flipCard() {
+    flipInner.classList.toggle("flipped");
+  }
+
 </script>
 
 {% endblock %}
