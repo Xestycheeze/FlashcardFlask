@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1 class="middle">Create Sets</h1>
-<form action="/create_set" method="POST" class="middle">
+<form action="{{ url_for('create_sets') }}" method="POST" class="middle">
     <label for="name">Name:</label>
     <input type="text" id="name" name="name" required>
     <br />

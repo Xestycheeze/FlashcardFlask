@@ -9,22 +9,24 @@
     <p class="middle">Create a set before creating your first flashcard!</p>
     <button class="middle" href="{{ url_for('create_sets') }}">Create Set</button>
 {% else %}
-    <form class="middle" action="/create_cards" method="POST">
-        <label for="front">Front (Question):</label>
-        <input type="text" id="front" name="front" required><br>
+<form class="middle" action="{{ url_for('create_cards', set_id=set_id) }}" method="POST">
+    <label for="front">Front (Question):</label>
+    <input type="text" id="front" name="front" required><br>
 
-        <label for="back">Back (Answer):</label>
-        <input type="text" id="back" name="back" required><br>
-        <br />
-        <label for="set_id">Choose the set this flashcard will be in:</label>
-        <select id="set_id" name="set_id">
-            {% for item in user_sets %}
-                <option value="{{ item.id }}">{{ item.name }}</option>
-            {% endfor %}
-        </select><br>
+    <label for="back">Back (Answer):</label>
+    <input type="text" id="back" name="back" required><br>
 
-        <button type="submit">Create Flashcard</button>
-    </form>
-{% endif %}
+    <label for="set_id">Choose the set this flashcard will be in:</label>
+    <select id="set_id" name="set_id">
+        {% for item in user_sets %}
+            <option value="{{ item.id }}" {% if set.id == item.id %} selected {% endif %}>
+                {{ item.name }}
+            </option>
+        {% endfor %}
+    </select><br>
+
+    <button type="submit">Create Flashcard</button>
+</form>
+
 
 {% endblock %}
