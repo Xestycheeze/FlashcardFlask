@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Create Card{% endblock %}
+
+{% block content %}
+<h1>Update Flashcard</h1>
+    <form id="flashcard-updater" method="POST">
+        <label for="front">Front (Question):</label>
+        <input type="text" id="front" name="front" placeholder="{{card.front}}"><br>
+
+        <label for="back">Back (Answer):</label>
+        <input type="text" id="back" name="back" placeholder="{{card.back}}"><br>
+
+        <label for="set_id">Choose the set this flashcard will be in:</label>
+        <select id="set_id" name="set_id">
+            {% for item in available_sets %}
+                <option value="{{ item.id }}" {% if card.set_id == item.id %} selected {% endif %}>
+                    {{ item.name }}
+                </option>
+            {% endfor %}
+        </select><br>
+
+        <button type="submit">Update Flashcard</button>
+        <button type="reset">Reset</button>
+    </form>
+<a href="{{ url_for('show_set_cards', set_id=card.set_id) }}">Cancel</a>
+    {% block javascript %}
+    <script>
+        // Set the default option to the second option (index 1)
+        document.getElementById('flashcard-updater').addEventListener('submit', function(event) {
+            event.preventDefault();
+            this.action = `/sets/{{ card.set_id }}/cards/{{card.id}}`;
+            this.submit();
+        });
+    </script>
+    {% endblock %}
+{% endblock %}
