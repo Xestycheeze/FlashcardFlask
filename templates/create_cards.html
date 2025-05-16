@@ -3,10 +3,13 @@
 {% block title %}Create Card{% endblock %}
 
 {% block content %}
-<h1>Create a Flashcard</h1>
+<h1 class="middle">Create a Flashcard</h1>
 
-
-<form action="{{ url_for('create_cards', set_id=set_id) }}" method="POST">
+{% if no_set %}
+    <p class="middle">Create a set before creating your first flashcard!</p>
+    <button class="middle" href="{{ url_for('create_sets') }}">Create Set</button>
+{% else %}
+<form class="middle" action="{{ url_for('create_cards', set_id=set_id) }}" method="POST">
     <label for="front">Front (Question):</label>
     <input type="text" id="front" name="front" required><br>
 
@@ -24,6 +27,6 @@
 
     <button type="submit">Create Flashcard</button>
 </form>
-
+{% endif %}
 
 {% endblock %}

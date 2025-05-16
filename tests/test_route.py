@@ -46,7 +46,7 @@ def test_create_cards_redirect(client):
 
 def test_homepage_accessible(client):
     res = client.get('/')
-    assert b'This is our Home Page' in res.data
+    assert b'/flaskify.jpg' in res.data
 
 
 def test_setspage_accessible(client):
@@ -77,12 +77,12 @@ def test_createcardspage_accessible(client):
 
 def test_loginpage_accessible(client):
     res = client.get('/login')
-    assert b'<button type="submit">Login</button>' in res.data
+    assert b'<button class="submit" type="submit">Login</button>' in res.data
 
 
 def test_signuppage_accessible(client):
     res = client.get('/signup')
-    assert b'<button type="submit">Sign Up</button>' in res.data
+    assert b'<button class="submit" type="submit">Sign Up</button>' in res.data
 
 
 def test_successful_login(client):
