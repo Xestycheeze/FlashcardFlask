@@ -17,6 +17,7 @@ def client():
     with app.test_client() as client:
         yield client
 
+# NOTE: helper functions
 def signup(client, username, fullname, password):
     return client.post('/signup', data={'username': username, 'fullname': fullname, 'password': password}, follow_redirects=True)
 
@@ -31,6 +32,7 @@ def create_set_and_card(client, name, cards):
         client.post(f'/sets/{set_id}/create_cards', data={'front': front, 'back': back, 'set_id': set_id}, follow_redirects=True)
     return set_id
 
+# NOTE: tests start here
 def test_quiz(client):
     signup(client, 'a', 'a a', 'a')
     login(client, 'a', 'a')
@@ -59,6 +61,7 @@ def test_quiz(client):
     assert b'a1' not in res.data
     assert b'b1' in res.data
     assert b'c1' not in res.data
+
 
 def test_multiuser_quiz(client):
     signup(client, 'b', 'b b', 'b')
