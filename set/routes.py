@@ -28,9 +28,14 @@ def create_sets():
     return redirect(url_for("user.login"))
 
 #view cards
-@set_bp.route('/<int:set_id>', methods=['GET'])
+@set_bp.route('/<int:set_id>', methods=['GET', 'POST'])
 def show_set_cards(set_id):
     set_data = SetModel.query.get_or_404(set_id)
+    if request.method == 'POST':
+        payload = request.form
+        if payload and len(payload.get("new-name").strip()) > 0:
+            set_data.name = payload.get("new-name").strip()
+            db.session.commit()
     return render_template("set_cards.html", set_data=set_data, cards=set_data.cards)
 
 @set_bp.route('/<int:set_id>/cards/<int:card_id>', methods=['GET', 'POST'])
