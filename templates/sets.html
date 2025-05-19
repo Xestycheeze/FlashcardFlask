@@ -3,15 +3,18 @@
 {% block title %}Sets{% endblock %}
 
 {% block content %}
-<h1>Here are the Flashcard sets you have:</h1>
-<a href="{{ url_for('create_sets') }}">Create Set</a>
+<h2>Here are the Flashcard sets you have:</h2>
+<a class="btn three" href="{{ url_for('create_sets') }}">Create Set</a>
 <ul>
     {% for set in sets %}
-        <li>
-            <a href="{{ url_for('show_set_cards', set_id=set.id) }}">{{ set.name }}</a>
-        </li>
+    <div class="set">
+        <table class="set">
+            <tr><th>Title</th><th>Date</th></tr>
+            <tr><td><a class="link" href="{{ url_for('show_set_cards', set_id=set.id) }}">{{ set.name }} </a></td><td>{{ set.createdate }}</td></tr>
+        </table>
+    </div>
     {% else %}
-        <li>No sets available<a href="{{ url_for('create_sets') }}">Create one</a></li>
+        <li>No sets available<a class="link" href="{{ url_for('create_sets') }}">Create one</a></li>
     {% endfor %}
 </ul>
 {% endblock %}
