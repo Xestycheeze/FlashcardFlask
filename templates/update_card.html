@@ -23,7 +23,7 @@
         <button type="submit">Update Flashcard</button>
         <button type="reset">Reset</button>
     </form>
-<a href="{{ url_for('show_set_cards', set_id=card.set_id) }}">Cancel</a>
+<a href="{{ url_for('set.show_set_cards', set_id=card.set_id) }}">Cancel</a>
     {% block javascript %}
     <script>
         // Set the default option to the second option (index 1)

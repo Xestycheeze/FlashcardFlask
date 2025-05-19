@@ -3,32 +3,61 @@
 {% block title %}Cards in {{ set_data.name }}{% endblock %}
 
 {% block content %}
-<h1>Cards in {{ set_data.name }}</h1>
-<a class="btn four" href="{{ url_for('create_cards', set_id=set_data.id) }}">
-    Add a new card
-</a>
-<ul>
-    {% for card in cards %}
-        <div class="card">
-            <table>
-                <tr><th><strong>Q:</strong> {{ card.front }}</th></tr> <tr><td><strong>A:</strong> {{ card.back }}</td></tr>
-            </table>
-            <a class="" href="{{ url_for('update_card', set_id=set_data.id, card_id=card.id) }}">Edit</a>
-            <form class="flashcard-deleter" method="POST" action="{{ url_for('delete_card', card_id=card.id) }}">
-                <button>Delete</button>
-            </form>
-        </div>
-        
-    {% else %}
-        <p class="small">No cards in this set</p>
-    {% endfor %}
-</ul>
+<h1>Cards in <span id="set-name-h1">{{ set_data.name }}</span></h1>
+    <button id="set-updater-enabler" type="button">Edit set name</button>
+        <form action="{{ url_for('set.show_set_cards', set_id=set_data.id) }}" style="display: none;" id="set-updater" method="POST">
+        <input type="text" name="new-name" placeholder="{{ set_data.name }}" required>
+        <button type="submit">Update set name</button>
+        </form>
+        <button style="display: none;" id="set-updater-canceller" type="button">Cancel</button>
+    <br/>
+    <form id="set_deleter" method="POST" action="{{ url_for('set.delete_set', set_id=set_data.id) }}">
+        <button>Delete Set</button>
+    </form>
+    <a class="btn four" href="{{ url_for('set.create_cards', set_id=set_data.id) }}">
+        Add a new card
+    </a>
+    <ul>
+        {% for card in cards %}
+            <div class="card">
+                <table>
+                    <tr><th><strong>Q:</strong> {{ card.front }}</th></tr> <tr><td><strong>A:</strong> {{ card.back }}</td></tr>
+                </table>
+                <a class="" href="{{ url_for('set.update_card', set_id=set_data.id, card_id=card.id) }}">Edit</a>
+                <form class="flashcard-deleter" method="POST" action="{{ url_for('set.delete_card', card_id=card.id) }}">
+                    <button>Delete</button>
+                </form>
+            </div>
+
+        {% else %}
+            <p class="small">No cards in this set</p>
+        {% endfor %}
+    </ul>
 
     {% block javascript %}
     <script>
-        let deleteButtons = document.getElementsByClassName('flashcard-deleter')
-        for (let idx = 0; idx < deleteButtons.length; idx++){
-            deleteButtons[idx].addEventListener('submit', function(event) {
+        let showUpdateSetButton = document.getElementById('set-updater-enabler');
+        let hideUpdateSetButton = document.getElementById('set-updater-canceller');
+        showUpdateSetButton.addEventListener('click', function(event){
+            document.getElementById('set-updater').style.display = 'inline';
+            hideUpdateSetButton.style.display = 'inline';
+            this.style.display = 'none';
+        });
+        hideUpdateSetButton.addEventListener('click', function(event){
+            document.getElementById('set-updater-enabler').style.display = 'inline';
+            document.getElementById('set-updater').style.display = 'none';
+            this.style.display = 'none';
+        });
+        document.getElementById('set_deleter').addEventListener('submit', function(event){
+            event.preventDefault();
+            let text = "Are you sure you want to delete this set? All cards in this set will be removed."
+            if (confirm(text) === true){
+                this.submit();
+            }
+        });
+        let deleteCardButtons = document.getElementsByClassName('flashcard-deleter')
+        for (let idx = 0; idx < deleteCardButtons.length; idx++){
+            deleteCardButtons[idx].addEventListener('submit', function(event) {
             event.preventDefault();
             let text = "Are you sure you want to delete this card?"
             if (confirm(text) === true){

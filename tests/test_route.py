@@ -46,7 +46,8 @@ def test_create_cards_redirect(client):
 
 def test_homepage_accessible(client):
     res = client.get('/')
-    assert b'/flaskify.jpg' in res.data
+    assert res.status_code == 200
+    assert b'Welcome to Flaskify' in res.data
 
 
 def test_setspage_accessible(client):
