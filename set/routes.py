@@ -31,12 +31,24 @@ def create_sets():
 @set_bp.route('/<int:set_id>', methods=['GET', 'POST'])
 def show_set_cards(set_id):
     set_data = SetModel.query.get_or_404(set_id)
-    if request.method == 'POST':
+    if request.method == 'POST': # Updates name of set
         payload = request.form
         if payload and len(payload.get("new-name").strip()) > 0:
             set_data.name = payload.get("new-name").strip()
             db.session.commit()
     return render_template("set_cards.html", set_data=set_data, cards=set_data.cards)
+
+@set_bp.route('/delete/set/<int:set_id>', methods=['POST'])
+def delete_set(set_id):
+    target_set = SetModel.query.get_or_404(set_id)
+    try:
+        # SetModel deletion was already defined to cascade onto CardModel
+        db.session.delete(target_set)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return redirect(url_for('set.show_set_cards', set_id=set_id))
+    return redirect(url_for('set.show_sets'))
 
 @set_bp.route('/<int:set_id>/cards/<int:card_id>', methods=['GET', 'POST'])
 def update_card(set_id, card_id):
