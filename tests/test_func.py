@@ -238,7 +238,7 @@ def test_delete_card(client):
     assert card_5 is None
 
     # delete 2nd card
-    client.post(f'/delete/card/{card_ids_h[1]}')
+    client.post(f'/sets/delete/card/{card_ids_h[1]}')
 
     # verify 2nd card deletion
     del_card_2 = CardModel.query.filter_by(id=card_ids_h[1]).first()

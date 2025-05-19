@@ -174,3 +174,5 @@ cython_debug/
 .pypirc
 
 data/flashcard_flask.db
+
+tests/data/flashcard_flask.db
