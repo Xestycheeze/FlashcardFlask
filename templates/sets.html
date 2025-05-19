@@ -6,15 +6,17 @@
 <h2>Here are the Flashcard sets you have:</h2>
 <a class="btn three" href="{{ url_for('set.create_sets') }}">Create Set</a>
 <ul>
-    {% for set in sets %}
+    {% if sets %}
     <div class="set">
         <table class="set">
             <tr><th>Title</th><th>Date</th></tr>
+            {% for set in sets %}
             <tr><td><a class="link" href="{{ url_for('set.show_set_cards', set_id=set.id) }}">{{ set.name }} </a></td><td>{{ set.createdate }}</td></tr>
+            {% endfor %}
         </table>
     </div>
     {% else %}
         <li>No sets available<a class="link" href="{{ url_for('set.create_sets') }}">Create one</a></li>
-    {% endfor %}
+    {% endif %}
 </ul>
 {% endblock %}
