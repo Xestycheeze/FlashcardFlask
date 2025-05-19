@@ -15,7 +15,7 @@
         <ul class="result">
             {% for set in results.sets %}
                 <li class="item">
-                    <a class="link" href="{{ url_for('show_set_cards', set_id=set.id) }}">{{ set.name }}</a>
+                    <a class="link" href="{{ url_for('set.show_set_cards', set_id=set.id) }}">{{ set.name }}</a>
                 </li>
             {% endfor %}
         </ul>
@@ -28,7 +28,7 @@
                 <li class="item">
                     <strong>Front:</strong> {{ card.front }}<br>
                     <strong>Back:</strong> {{ card.back }}<br>
-                    <a class="link card" href="{{ url_for('show_set_cards', set_id=card.set_id) }}">Go to Set</a>
+                    <a class="link card" href="{{ url_for('set.show_set_cards', set_id=card.set_id) }}">Go to Set</a>
                 </li>
             {% endfor %}
         </ul>

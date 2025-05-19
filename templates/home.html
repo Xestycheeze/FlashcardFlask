@@ -15,11 +15,11 @@
         <p class="subtitle">The smart way to create, study, quiz, and repeat flashcards</p>
         <div class="homebtn">
             {% if not session.get('user_id') %}
-                <a href="{{ url_for('signup') }}" class="btn one">Start Learning <br> Now</a>
-                <a href="{{ url_for('login') }}" class="btn two">Existing User? <br>Login</a>
+                <a href="{{ url_for('user.signup') }}" class="btn one">Start Learning <br> Now</a>
+                <a href="{{ url_for('user.login') }}" class="btn two">Existing User? <br>Login</a>
             {% else %}
-                <a href="{{ url_for('create_sets') }}" class="btn one">Create New Set</a>
-                <a href="{{ url_for('create_cards') }}" class="btn two">Add a New Card</a>
+                <a href="{{ url_for('set.create_sets') }}" class="btn one">Create New Set</a>
+                <a href="{{ url_for('set.create_cards') }}" class="btn two">Add a New Card</a>
             {% endif %}
     </div>
 </div>

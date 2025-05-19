@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1>Cards in {{ set_data.name }}</h1>
-<a class="btn four" href="{{ url_for('create_cards', set_id=set_data.id) }}">
+<a class="btn four" href="{{ url_for('set.create_cards', set_id=set_data.id) }}">
     Add a new card
 </a>
 <ul>
@@ -13,8 +13,8 @@
             <table>
                 <tr><th><strong>Q:</strong> {{ card.front }}</th></tr> <tr><td><strong>A:</strong> {{ card.back }}</td></tr>
             </table>
-            <a class="" href="{{ url_for('update_card', set_id=set_data.id, card_id=card.id) }}">Edit</a>
-            <form class="flashcard-deleter" method="POST" action="{{ url_for('delete_card', card_id=card.id) }}">
+            <a class="" href="{{ url_for('set.update_card', set_id=set_data.id, card_id=card.id) }}">Edit</a>
+            <form class="flashcard-deleter" method="POST" action="{{ url_for('set.delete_card', card_id=card.id) }}">
                 <button>Delete</button>
             </form>
         </div>
