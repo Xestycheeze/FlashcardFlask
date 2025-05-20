@@ -243,3 +243,83 @@ def test_delete_card(client):
     # verify 2nd card deletion
     del_card_2 = CardModel.query.filter_by(id=card_ids_h[1]).first()
     assert del_card_2 is None
+
+
+# update set
+def test_update_set_name(client):
+    signup(client, 'i', 'i i', 'i')
+    login(client, 'i', 'i')
+
+    set_id_i = create_set(client, 'set_name_i')
+
+    # update set name
+    res = client.post(f'/sets/{set_id_i}', data={'new-name': 'set_name_ii'}, follow_redirects=True)
+
+    # verify
+    assert b'set_name_ii' in res.data
+
+
+# delete set
+def test_delete_set(client):
+    signup(client, 'j', 'j j', 'j')
+    login(client, 'j', 'j')
+
+    set_id_j, card_ids_j = create_set_and_card(client, 'set_name_j', [('j1', 'j1'), ('j2', 'j2')])
+
+    #logout first user 
+    response = client.get('/logout', follow_redirects=False)
+    assert response.status_code == 302
+
+    # sign in second user, create set, logout
+    signup(client, 'd', 'd d', 'd')
+    login(client, 'd', 'd')
+    user_db = UserModel.query.filter_by(username='d')
+    assert user_db is not None
+    
+    set_id_d, card_ids_d = create_set_and_card(client, 'set_name_d', [('d', 'd')])
+    response = client.get('/logout', follow_redirects=False)
+    assert response.status_code == 302
+
+    # login first user again
+    login(client, 'j', 'j')
+
+    # check db if set j exists
+    db_j = SetModel.query.filter_by(id=set_id_j).first()
+    assert db_j is not None
+
+    # delete set
+    res = client.post(f'/sets/delete/set/{set_id_j}', follow_redirects=True)
+
+    # check html
+    res = client.get('/sets')
+    assert b'No sets available' in res.data
+    
+    # check db if deleted
+    db.session.expire_all()
+    db_j_del = SetModel.query.filter_by(id=set_id_j).first()
+    print(db_j_del)
+    assert db_j_del is None
+
+    # check db if second user unaffected
+    db_d_del = SetModel.query.filter_by(id=set_id_d).first()
+    print(db_d_del)
+    assert db_d_del is not None
+
+
+# change card set
+def test_change_card_set(client):
+    signup(client, 'k', 'k k', 'k')
+    login(client, 'k', 'k')
+
+    set_id_k, card_ids_k = create_set_and_card(client, 'set_name_k', [('k1', 'k1'), ('k2', 'k2')])
+    set_id_l, card_ids_l = create_set_and_card(client, 'set_name_l', [('l1', 'l1'), ('l2', 'l2')])
+
+    # 2nd card (set k) to set l
+    client.post(f'/sets/{set_id_k}/cards/{card_ids_k[1]}', data={'set_id':set_id_l})
+
+    # verify if card changed sets
+    res = client.get(f'/sets/{set_id_l}')
+    assert b'<strong>Q:</strong> l2' in res.data
+    # check db
+    updated_card = CardModel.query.filter_by(id=card_ids_k[1]).first()
+    assert updated_card.set_id == set_id_l
