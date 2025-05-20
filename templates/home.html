@@ -43,23 +43,4 @@
     </div>
 </div>
 
-<table>
-    <thead>
-        <p>List of users (for testing purposes):</p>
-    <tr>
-        <th>ID</th>
-        <th>Username</th>
-        <th>Fullname</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for data in users %}
-        <tr>
-            <td>{{data.id}}</td>
-            <td>{{data.username}}</td>
-            <td>{{data.fullname}}</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
 {% endblock %}
