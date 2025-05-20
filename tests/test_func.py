@@ -17,7 +17,7 @@ def client():
     with app.test_client() as client:
         yield client
 
-# NOTE: helper functions
+# ====================================================================================== tests start here ===================================================================================
 def signup(client, username, fullname, password):
     return client.post('/signup', data={'username': username, 'fullname': fullname, 'password': password}, follow_redirects=True)
 
@@ -27,6 +27,21 @@ def login(client, username, password):
 def decode_html(res):
     html = res.data.decode().replace('\n', '').replace('  ', ' ')
     return html
+
+def get_user(username):
+    return UserModel.query.filter_by(username=username).first()
+
+def get_set_by_name(set_name):
+    return SetModel.query.filter_by(name=set_name).first()
+
+def get_set_by_id(set_id):
+    return SetModel.query.filter_by(id=set_id).first()  
+
+def get_card_by_front(front):
+    return CardModel.query.filter_by(front=front).first()
+
+def get_card_by_id(card_id):
+    return CardModel.query.get(card_id)
 
 def create_set(client, name):
     client.post('/sets/create_set', data={'name': name}, follow_redirects=True)
@@ -49,14 +64,14 @@ def update_card(client):
     return client.post('/sets/<int:set_id>/cards/<int:card_id>', data={})
 
 
-# NOTE: tests start here
+# =================================================================================== tests start here =======================================================================================
 # create set
 def test_create_set(client):
     signup(client, 'a', 'a a', 'a')
     login(client, 'a', 'a')
 
     # check db for user
-    user_db = UserModel.query.filter_by(username='a')
+    user_db = get_user('a')
     assert user_db is not None
 
     create_set(client, 'set_name_a')
@@ -64,7 +79,7 @@ def test_create_set(client):
     assert b'set_name_a' in res.data
 
     # check db for set
-    set_db = SetModel.query.filter_by(name='set_name_a').first()
+    set_db = get_set_by_name('set_name_a')
     assert set_db is not None
 
 
@@ -73,7 +88,7 @@ def test_create_card(client):
     signup(client, 'b', 'b b', 'b')
     login(client, 'b', 'b')
 
-    user_db = UserModel.query.filter_by(username='b')
+    user_db = get_user('b')
     assert user_db is not None
 
     set_id, card_ids = create_set_and_card(client, 'set_name_b', [('b', 'b')])
@@ -82,10 +97,10 @@ def test_create_card(client):
     assert b'<strong>Q:</strong> b' in res.data
 
     # check db for set, card
-    set_db = SetModel.query.filter_by(id=set_id).first()
+    set_db = get_set_by_name('set_name_b')
     assert set_db is not None
 
-    card_db = CardModel.query.filter_by(front='b').first()
+    card_db = get_card_by_front('b')
     assert card_db is not None
 
 
@@ -95,7 +110,7 @@ def test_exclusive_cards_sets(client):
     signup(client, 'c', 'c c', 'c')
     login(client, 'c', 'c')
 
-    user_db = UserModel.query.filter_by(username='c')
+    user_db = get_user('c')
     assert user_db is not None
 
     set_id_c, card_ids_c = create_set_and_card(client, 'set_name_c', [('c', 'c')])
@@ -114,7 +129,7 @@ def test_exclusive_cards_sets(client):
     signup(client, 'd', 'd d', 'd')
     login(client, 'd', 'd')
 
-    user_db = UserModel.query.filter_by(username='d')
+    user_db = get_user('d')
     assert user_db is not None
 
     set_id_d, card_ids_d = create_set_and_card(client, 'set_name_d', [('d', 'd')])
@@ -128,16 +143,16 @@ def test_exclusive_cards_sets(client):
     assert b'<strong>Q:</strong> d' in res.data
 
     # check db for set, card
-    set_db_c = SetModel.query.filter_by(name='set_name_c').first()
+    set_db_c = get_set_by_name('set_name_c')
     assert set_db_c is not None
 
-    card_db_c = CardModel.query.filter_by(front='c').first()
+    card_db_c = get_card_by_front('c')
     assert card_db_c is not None
 
-    set_db_d = SetModel.query.filter_by(name='set_name_d').first()
+    set_db_d = get_set_by_name('set_name_d')
     assert set_db_d is not None
 
-    card_db_d = CardModel.query.filter_by(front='d').first()
+    card_db_d = get_card_by_front('d')
     assert card_db_d is not None
 
 
@@ -221,10 +236,10 @@ def test_delete_card(client):
     print(card_ids_h)
     
     # check db for all cards
-    card_1 = CardModel.query.filter_by(id=card_ids_h[0]).first()
-    card_2 = CardModel.query.filter_by(id=card_ids_h[1]).first()
-    card_3 = CardModel.query.filter_by(id=card_ids_h[2]).first()
-    card_4 = CardModel.query.filter_by(id=card_ids_h[3]).first()
+    card_1 = get_card_by_id(card_ids_h[0])
+    card_2 = get_card_by_id(card_ids_h[1])
+    card_3 = get_card_by_id(card_ids_h[2])
+    card_4 = get_card_by_id(card_ids_h[3])
     assert card_1 is not None
     assert card_2 is not None
     assert card_3 is not None
@@ -234,14 +249,14 @@ def test_delete_card(client):
     print(html)
     
     # check non-existent card 5
-    card_5 = CardModel.query.filter_by(id=999).first()
+    card_5 = get_card_by_id(999)
     assert card_5 is None
 
     # delete 2nd card
     client.post(f'/sets/delete/card/{card_ids_h[1]}')
 
     # verify 2nd card deletion
-    del_card_2 = CardModel.query.filter_by(id=card_ids_h[1]).first()
+    del_card_2 = get_card_by_id(card_ids_h[1])
     assert del_card_2 is None
 
 
@@ -273,7 +288,7 @@ def test_delete_set(client):
     # sign in second user, create set, logout
     signup(client, 'd', 'd d', 'd')
     login(client, 'd', 'd')
-    user_db = UserModel.query.filter_by(username='d')
+    user_db = get_user('d')
     assert user_db is not None
     
     set_id_d, card_ids_d = create_set_and_card(client, 'set_name_d', [('d', 'd')])
@@ -284,7 +299,7 @@ def test_delete_set(client):
     login(client, 'j', 'j')
 
     # check db if set j exists
-    db_j = SetModel.query.filter_by(id=set_id_j).first()
+    db_j = get_set_by_id(set_id_j)
     assert db_j is not None
 
     # delete set
@@ -294,14 +309,15 @@ def test_delete_set(client):
     res = client.get('/sets')
     assert b'No sets available' in res.data
     
-    # check db if deleted
+    # refresh db
     db.session.expire_all()
-    db_j_del = SetModel.query.filter_by(id=set_id_j).first()
+    # check db if deleted
+    db_j_del = get_set_by_id(set_id_j)
     print(db_j_del)
     assert db_j_del is None
 
     # check db if second user unaffected
-    db_d_del = SetModel.query.filter_by(id=set_id_d).first()
+    db_d_del = get_set_by_id(set_id_d)
     print(db_d_del)
     assert db_d_del is not None
 
@@ -321,5 +337,5 @@ def test_change_card_set(client):
     res = client.get(f'/sets/{set_id_l}')
     assert b'<strong>Q:</strong> l2' in res.data
     # check db
-    updated_card = CardModel.query.filter_by(id=card_ids_k[1]).first()
+    updated_card = get_card_by_id(card_ids_k[1])
     assert updated_card.set_id == set_id_l
