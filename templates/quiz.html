@@ -5,7 +5,7 @@
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/flip.css') }}">
 
-<h1>Quiz</h1>
+<h1 class="middle">Quiz</h1>
 
 {% if cards %}
   
@@ -40,7 +40,7 @@
 
 
 <a href="{{ url_for('quiz.select_quiz_sets') }}">
-    <button>Back</button>
+    <button class="cancel">Back</button>
 </a>
 
 
