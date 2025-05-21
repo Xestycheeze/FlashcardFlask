@@ -80,9 +80,13 @@ body {
 }
 /* signup, login, etc */
 .submit {
-    border-radius:		30px;
-    font-size: 			14px;
-    padding: 			3px;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+    
 }
 .middle {
     text-align:			center;
@@ -100,7 +104,14 @@ h1.middle {
     margin-top: 20px;
     padding: 5px;
 }
-
+.textbox {
+    border: 1px solid #000;
+    border-radius: 0;
+    font-size: 12px;
+    padding: 5px 10px;
+    width: 200px;
+    background-color: transparent;
+}
 /* set table, display data */
 .set table {
     background-color: #FFFFFF;
@@ -124,16 +135,80 @@ h1.middle {
     color: #ffffff;
     font-weight: bold;
 }
+
+.update-set {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+#set_deleter button {
+    background-color: #861b13;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+#set-updater-enabler {
+    background-color: #0b6628;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+}
+#set-updater input {
+    border: 1px solid #000;
+    border-radius: 0;
+    font-size: 12px;
+    padding: 5px 10px;
+    width: 200px;
+    background-color: transparent;
+}
+#set-updater button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+}
+#set-updater-canceller {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+}
+
+#set-updater-canceller:hover, #set-updater button:hover, #set_deleter button:hover, #set-updater-enabler:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
 /* cards */
+.card {
+    background-color: #E5E9F0;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    position: relative;
+    width: 30%;
+    transition: transform 0.2s ease;
+}
+
 .card table{
     background-color: #5E81AC;
     border-collapse: collapse;
-    margin: 30px;
-    width: 20%;
+    width: 100%;
     border-radius: 8px;
-    font-size: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-size: 18px;
     overflow: hidden;
+    margin: 0 0 15px 0;
 }
 .card th, .card td {
     padding: 50px;
@@ -143,6 +218,7 @@ h1.middle {
 
 .card th {
     background-color: #576575;
+    color: #E5E9F0;
     font-weight: bold;
 }
 .card a, .card button {
@@ -152,7 +228,7 @@ h1.middle {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     transition: color 0.3s ease;
-    margin-left: 40px;
+    
     
 }
 .card button {
@@ -173,16 +249,35 @@ h1.middle {
 .middle {
     text-align: center;
 }
+.flashcard-deleter button{
+    padding: 8px 10px;
+    border-radius: 4px;
+    border: none;
+    background-color: #BF616A;
+    color: white;
+    margin-left: 5px;
+    
+}
+.flashcard-editor {
+    margin-top: 10px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    border: none;
+    background-color: #88C0D0;
+    color: white;
+
+}
+.card-action {
+    display: flex;
+}
 /* home page */
 .intro {
     display: flex;
-    align-items: center;
+    justify-content: center;
     gap: 50px;
     padding: 80px 0;
 }
-.intro-content {
-    flex: 1;
-}
+
 .intro h1 {
     font-size: 2.8rem;
     line-height: 1.2;
@@ -211,14 +306,14 @@ h1.middle {
     display: inline-block;
 }
 .btn.one {
-    background-color: #EBCB8B;
+    background-color: #e7b655;
     color: white;
     box-shadow: 0 4px 14px rgba(67, 97, 238, 0.3);
 }
 
 .btn.two {
-    border: 2px solid #EBCB8B;
-    color: #EBCB8B;
+    border: 2px solid #e7b655;
+    color: #e7b655;
 }
 
 .btn.three {
@@ -246,10 +341,46 @@ h1.middle {
     border-radius: 6px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-.link.card {
+.resultlink {
     background-color: rgba(54, 57, 62, 0.25);
+    text-decoration: none;
+    color:#000;
+    padding: 2px;
+    border-radius: 2px;
+    
 }
 .item {
     margin-top: 5px;
     margin-bottom: 10px;
+}
+.margin {
+    margin-top: 20px;
+}
+.cancel {
+    margin-top: 10px;
+    margin-right: 180px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    border: none;
+    background-color: #d2564a;
+    color: white;
+    text-decoration: none;
+}
+.update-flash {
+    padding: 8px 10px;
+    border-radius: 4px;
+    border: none;
+    background-color: #61bf7f;
+    color: white;
+}
+.reset {
+    padding: 8px 10px;
+    border-radius: 4px;
+    border: none;
+    background-color: #416eaa;
+    color: white;
+}
+.loginsignup {
+    text-decoration: none;
+    color: #185caf;
 }

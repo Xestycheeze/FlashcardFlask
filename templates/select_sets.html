@@ -7,10 +7,12 @@
     {% if sets %}
         <form method="POST">
             {% for set in sets %}
+            <div class="checkbox">
                 <input type="checkbox" name="set_ids" value="{{ set.id }}"> {{ set.name }}<br>
+            </div>
             {% endfor %}
             <br>
-            <button type="submit">Start Quiz</button>
+            <button class="reset" type="submit">Start Quiz</button>
         </form>
     {% else %}
         <p>There are no sets to start the quiz!</p>

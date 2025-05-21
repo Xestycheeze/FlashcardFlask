@@ -12,7 +12,7 @@
         <button style="display: none;" id="set-updater-canceller" type="button">Cancel</button>
     <br/>
     <form id="set_deleter" method="POST" action="{{ url_for('set.delete_set', set_id=set_data.id) }}">
-        <button>Delete Set</button>
+        <button class="delete-set">Delete Set</button>
     </form>
     <a class="btn four" href="{{ url_for('set.create_cards', set_id=set_data.id) }}">
         Add a new card
@@ -23,10 +23,12 @@
                 <table>
                     <tr><th><strong>Q:</strong> {{ card.front }}</th></tr> <tr><td><strong>A:</strong> {{ card.back }}</td></tr>
                 </table>
-                <a class="" href="{{ url_for('set.update_card', set_id=set_data.id, card_id=card.id) }}">Edit</a>
-                <form class="flashcard-deleter" method="POST" action="{{ url_for('set.delete_card', card_id=card.id) }}">
-                    <button>Delete</button>
-                </form>
+                <div class="card-action">
+                    <a class="flashcard-editor" href="{{ url_for('set.update_card', set_id=set_data.id, card_id=card.id) }}">Edit</a>
+                    <form class="flashcard-deleter" method="POST" action="{{ url_for('set.delete_card', card_id=card.id) }}">
+                        <button>Delete</button>
+                    </form>
+                </div>
             </div>
 
         {% else %}

@@ -3,27 +3,27 @@
 {% block title %}Create Card{% endblock %}
 
 {% block content %}
-<h1>Update Flashcard</h1>
-    <form id="flashcard-updater" method="POST">
+<h1 class="middle">Update Flashcard</h1>
+    <form class="middle" id="flashcard-updater" method="POST">
         <label for="front">Front (Question):</label>
-        <input type="text" id="front" name="front" placeholder="{{card.front}}"><br>
+        <input class="textbox" type="text" id="front" name="front" placeholder="{{card.front}}"><br>
 
         <label for="back">Back (Answer):</label>
-        <input type="text" id="back" name="back" placeholder="{{card.back}}"><br>
+        <input class="textbox" type="text" id="back" name="back" placeholder="{{card.back}}"><br>
 
         <label for="set_id">Choose the set this flashcard will be in:</label>
-        <select id="set_id" name="set_id">
+        <select class="margin" id="set_id" name="set_id">
             {% for item in available_sets %}
                 <option value="{{ item.id }}" {% if card.set_id == item.id %} selected {% endif %}>
                     {{ item.name }}
                 </option>
             {% endfor %}
         </select><br>
-
-        <button type="submit">Update Flashcard</button>
-        <button type="reset">Reset</button>
+        
+        <a class="cancel" href="{{ url_for('set.show_set_cards', set_id=card.set_id) }}">Cancel</a>
+        <button class="update-flash" type="submit">Update Flashcard</button>
+        <button class="reset" type="reset">Reset</button>
     </form>
-<a href="{{ url_for('set.show_set_cards', set_id=card.set_id) }}">Cancel</a>
     {% block javascript %}
     <script>
         // Set the default option to the second option (index 1)

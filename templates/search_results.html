@@ -28,7 +28,7 @@
                 <li class="item">
                     <strong>Front:</strong> {{ card.front }}<br>
                     <strong>Back:</strong> {{ card.back }}<br>
-                    <a class="link card" href="{{ url_for('set.show_set_cards', set_id=card.set_id) }}">Go to Set</a>
+                    <a class="resultlink" href="{{ url_for('set.show_set_cards', set_id=card.set_id) }}">Go to Set</a>
                 </li>
             {% endfor %}
         </ul>

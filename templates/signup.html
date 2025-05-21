@@ -6,15 +6,15 @@
 <h1 class="middle">Sign Up</h1>
 <form class="middle" method="POST">
     <label>Username:</label>
-    <input type="text" name="username" required><br>
+    <input class="textbox" type="text" name="username" required><br>
 
     <label>Full Name:</label>
-    <input type="text" name="fullname" required><br>
+    <input class="textbox" type="text" name="fullname" required><br>
 
     <label>Password:</label>
-    <input type="password" name="password" required><br>
+    <input class="textbox" type="password" name="password" required><br>
 
     <button class="submit" type="submit">Sign Up</button>
 </form>
-<p class="middle">Have an account? <a class="small" href="{{ url_for('user.login') }}">Login here</a></p>
+<p class="middle">Have an account? <a class="loginsignup" href="{{ url_for('user.login') }}">Login here</a></p>
 {% endblock %}
