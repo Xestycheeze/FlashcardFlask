@@ -16,14 +16,14 @@ def client():
     with app.test_client() as client:
         yield client
 
-# NOTE: helper functions
+# =================================================================================== helper functions =======================================================================================
 def signup(client, username, fullname, password):
     return client.post('/signup', data={'username': username, 'fullname': fullname, 'password': password}, follow_redirects=True)
 
 def login(client, username, password):
     return client.post('/login', data={'username': username, 'password': password}, follow_redirects=True)
 
-# NOTE: tests start here
+# =================================================================================== tests start here =======================================================================================
 def test_failed_login(client):
     res = client.post('/login', data={'username': 'invalid', 'password': 'wrong'})
     assert res.status_code == 302
